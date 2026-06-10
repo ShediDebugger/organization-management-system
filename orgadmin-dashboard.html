@@ -1,0 +1,2473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Organization Admin Dashboard — OrgMember</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg-dark:      #f8fafc;
+      --bg-card:      #ffffff;
+      --bg-card-2:    #f4f7fb;
+      --accent:       #f5a623;
+      --accent-hover: #e09520;
+      --accent-light: rgba(245,166,35,0.12);
+      --text-white:   #0b1628;
+      --text-muted:   #556c89;
+      --text-dim:     #6b7b8f;
+      --border:       rgba(15,23,42,0.08);
+      --nav-bg:       #ffffff;
+      --navbar-toggler-icon-filter: invert(0);
+      --radius:       12px;
+      --success:      #4cd177;
+      --warning:      #ffa800;
+      --danger:       #ff6b6b;
+    }
+
+    .theme-feature {
+      --bg-dark:      #0b1628;
+      --bg-card:      #11213a;
+      --bg-card-2:    #162340;
+      --accent:       #f5a623;
+      --accent-hover: #e09520;
+      --accent-light: rgba(245,166,35,0.12);
+      --text-white:   #ffffff;
+      --text-muted:   #8fa8c8;
+      --text-dim:     #5a9a9a;
+      --border:       rgba(255,255,255,0.07);
+      --nav-bg:       rgba(11,22,40,0.95);
+      --navbar-toggler-icon-filter: invert(1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg-dark);
+      color: var(--text-white);
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      min-height: 100vh;
+    }
+    h1, h2, h3 { font-family: 'Playfair Display', serif; font-weight: 700; }
+
+    .dashboard-wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 260px;
+      background: var(--bg-card);
+      border-right: 1px solid var(--border);
+      padding: 24px 16px;
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .sidebar-header {
+      margin-bottom: 32px;
+    }
+
+    .sidebar-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .sidebar-subtitle {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .menu-item {
+      margin-bottom: 8px;
+    }
+
+    .menu-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: var(--radius);
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .menu-link:hover {
+      background: rgba(245,166,35,0.1);
+      color: var(--accent);
+    }
+
+    .menu-link.active {
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    .menu-icon {
+      font-size: 1.1rem;
+      width: 20px;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .user-avatar-sm {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--accent-light);
+      border: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--accent);
+    }
+
+    .user-profile-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .user-profile-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-white);
+    }
+
+    .user-profile-org {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+
+    .edit-profile-link {
+      font-size: 0.75rem;
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    /* ── MAIN CONTENT ── */
+    .main-content {
+      flex: 1;
+      margin-left: 260px;
+      padding: 32px;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-white);
+      margin: 0;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .notification-badge {
+      position: relative;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: var(--text-muted);
+    }
+
+    .notification-badge::after {
+      content: '3';
+      position: absolute;
+      top: -8px;
+      right: -6px;
+      background: var(--danger);
+      color: white;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .user-dropdown-wrapper {
+      position: relative;
+    }
+
+    .user-profile-dropdown {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 0;
+    }
+
+    .user-dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      min-width: 180px;
+      margin-top: 8px;
+      display: none;
+      z-index: 1000;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .user-dropdown-menu.show {
+      display: block;
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+      border: none;
+      background: transparent;
+      width: 100%;
+      cursor: pointer;
+      text-align: left;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .dropdown-item:hover {
+      background: rgba(245,166,35,0.1);
+      color: var(--accent);
+    }
+
+    .dropdown-item.dropdown-header {
+      font-weight: 600;
+      color: var(--text-white);
+      cursor: default;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dropdown-item.dropdown-header:hover {
+      background: transparent;
+      color: var(--text-white);
+    }
+
+    /* ── TAB CONTENT ── */
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* ── STAT CARDS ── */
+    .stat-cards-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .stat-card-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--accent-light);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .stat-card-content {
+      flex: 1;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text-white);
+      margin-bottom: 4px;
+    }
+
+    .stat-sub {
+      font-size: 0.8rem;
+      color: var(--success);
+    }
+
+    /* ── SECTIONS ── */
+    .section-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-white);
+      margin: 0;
+    }
+
+    .section-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* ── BUTTONS ── */
+    .btn-primary {
+      background: #2563eb;
+      border: none;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-primary:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ── SEARCH & FILTERS ── */
+    .search-bar {
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      color: var(--text-white);
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      font-size: 0.9rem;
+      font-family: 'Inter', sans-serif;
+      width: 300px;
+      margin-bottom: 16px;
+    }
+
+    .search-bar::placeholder {
+      color: var(--text-dim);
+    }
+
+    .controls-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filter-select {
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      color: var(--text-white);
+      padding: 8px 12px;
+      border-radius: var(--radius);
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* ── TABLE ── */
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0;
+    }
+
+    thead {
+      background: var(--bg-card-2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      padding: 12px 14px;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    td {
+      padding: 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+
+    tbody tr:hover {
+      background: rgba(245,166,35,0.05);
+    }
+
+    /* ── MEMBER ROWS ── */
+    .member-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .member-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--accent-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .member-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .member-name {
+      font-weight: 600;
+      color: var(--text-white);
+      margin-bottom: 2px;
+    }
+
+    .member-email {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    /* ── BADGES ── */
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .badge-member {
+      background: rgba(37,99,235,0.15);
+      color: #2563eb;
+    }
+
+    .badge-active {
+      background: rgba(76,209,119,0.2);
+      color: var(--success);
+    }
+
+    .badge-inactive {
+      background: rgba(255,107,107,0.15);
+      color: var(--danger);
+    }
+
+    .badge-suspended {
+      background: rgba(255,168,0,0.15);
+      color: var(--warning);
+    }
+
+    .badge-pending {
+      background: rgba(255,168,0,0.15);
+      color: var(--warning);
+    }
+
+    .badge-overdue {
+      background: rgba(255,107,107,0.15);
+      color: var(--danger);
+    }
+
+    .badge-paid {
+      background: rgba(76,209,119,0.2);
+      color: var(--success);
+    }
+
+    .badge-draft {
+      background: rgba(107,107,107,0.2);
+      color: var(--text-dim);
+    }
+
+    .badge-published {
+      background: rgba(76,209,119,0.2);
+      color: var(--success);
+    }
+
+    .badge-general {
+      background: rgba(37,99,235,0.2);
+      color: #2563eb;
+    }
+
+    /* ── PAGINATION ── */
+    .pagination-info {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 16px;
+    }
+
+    .pagination-controls {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .pagination-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .pagination-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .pagination-btn.active {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: white;
+    }
+
+    /* ── BLOG CARDS ── */
+    .blog-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 18px;
+    }
+
+    .blog-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .blog-card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-white);
+      margin-bottom: 8px;
+    }
+
+    .blog-card-meta {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-bottom: 12px;
+    }
+
+    .blog-card-excerpt {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .blog-card-tags {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .blog-tag {
+      font-size: 0.7rem;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    /* ── PRICING CARDS ── */
+    .pricing-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .pricing-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      text-align: center;
+    }
+
+    .pricing-card-name {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-white);
+      margin-bottom: 8px;
+    }
+
+    .pricing-card-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .pricing-card-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text-white);
+      margin-bottom: 20px;
+    }
+
+    .pricing-card-features {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 24px;
+    }
+
+    .pricing-card-features li {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pricing-card-features li::before {
+      content: '👥';
+      font-size: 1rem;
+    }
+
+    .pricing-card-current {
+      font-size: 0.85rem;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .pricing-card-btn {
+      width: 100%;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar { width: 70px; }
+      .main-content { margin-left: 70px; padding: 20px; }
+      .search-bar { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="dashboard-wrapper">
+
+    <!-- ═══════════════════════════ SIDEBAR ═══════════════════════════ -->
+    <aside class="sidebar">
+
+      <div class="sidebar-header">
+        <div class="sidebar-brand">OrgMember
+</div>
+        <div class="sidebar-subtitle" id="orgName">Organization</div>
+      </div>
+
+      <ul class="sidebar-menu">
+        <li class="menu-item">
+          <div class="menu-link active" onclick="switchTab('dashboard')">
+            <i class="bi bi-graph-up menu-icon"></i>
+            <span>Dashboard</span>
+          </div>
+        </li>
+        <li class="menu-item">
+          <div class="menu-link" onclick="switchTab('members')">
+            <i class="bi bi-people-fill menu-icon"></i>
+            <span>Members</span>
+          </div>
+        </li>
+        <li class="menu-item">
+          <div class="menu-link" onclick="switchTab('events')">
+            <i class="bi bi-calendar-event menu-icon"></i>
+            <span>Events</span>
+          </div>
+        </li>
+        <li class="menu-item">
+          <div class="menu-link" onclick="switchTab('blog')">
+            <i class="bi bi-newspaper menu-icon"></i>
+            <span>Blog</span>
+          </div>
+        </li>
+        <li class="menu-item">
+          <div class="menu-link" onclick="switchTab('payments')">
+            <i class="bi bi-credit-card menu-icon"></i>
+            <span>Payments</span>
+          </div>
+        </li>
+        <li class="menu-item">
+          <div class="menu-link" onclick="switchTab('upgrade')">
+            <i class="bi bi-arrow-up menu-icon"></i>
+            <span>Upgrade Plan</span>
+          </div>
+        </li>
+        <li class="menu-item">
+          <div class="menu-link" onclick="switchTab('reports')">
+            <i class="bi bi-bar-chart menu-icon"></i>
+            <span>Reports</span>
+          </div>
+        </li>
+        <li class="menu-item">
+          <div class="menu-link" onclick="switchTab('settings')">
+            <i class="bi bi-gear menu-icon"></i>
+            <span>Settings</span>
+          </div>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="user-profile">
+          <div class="user-avatar-sm">SH</div>
+          <div class="user-profile-info">
+            <div class="user-profile-name" id="sidebarName">Admin</div>
+            <div class="user-profile-org">Organization</div>
+          </div>
+        </div>
+        <div style="font-size: 0.75rem; color: var(--text-dim);">Administrator</div>
+        <a href="#" class="edit-profile-link">Edit Profile</a>
+      </div>
+
+    </aside>
+
+    <!-- ═══════════════════════════ MAIN CONTENT ═══════════════════════════ -->
+    <main class="main-content">
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1 class="page-title">Dashboard</h1>
+        <div class="header-right">
+          <div class="notification-badge"><i class="bi bi-bell"></i></div>
+          <div class="notification-badge"><i class="bi bi-gear"></i></div>
+          <div class="user-dropdown-wrapper">
+            <button class="user-profile-dropdown" onclick="toggleUserDropdown()">
+              <span id="adminName">Admin</span> <i class="bi bi-chevron-down"></i>
+            </button>
+            <div class="user-dropdown-menu" id="userDropdown">
+              <div class="dropdown-item dropdown-header" id="dropdownName">Admin</div>
+              <a href="#" class="dropdown-item" onclick="return false;">
+                <i class="bi bi-person me-2"></i>Profile
+              </a>
+              <button class="dropdown-item" onclick="doLogout()">
+                <i class="bi bi-box-arrow-right me-2"></i>Log Out
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════ DASHBOARD TAB ═══════════════════════════ -->
+      <div id="dashboard-tab" class="tab-content active">
+
+        <!-- Stat Cards -->
+        <div class="stat-cards-row">
+          <div class="stat-card">
+            <div class="stat-card-icon"><i class="bi bi-people-fill"></i></div>
+            <div class="stat-card-content">
+              <div class="stat-label">Total Members</div>
+              <div class="stat-value" id="totalMembers">0</div>
+              <div class="stat-sub">↑ +12 this month</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon"><i class="bi bi-calendar-event"></i></div>
+            <div class="stat-card-content">
+              <div class="stat-label">Active Events</div>
+              <div class="stat-value" id="totalEvents">0</div>
+              <div class="stat-sub">upcoming this week</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon"><i class="bi bi-newspaper"></i></div>
+            <div class="stat-card-content">
+              <div class="stat-label">Total blogs</div>
+              <div class="stat-value" id="totalBlogs">0</div>
+              <div class="stat-sub">+12 Blogs</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon"><i class="bi bi-credit-card"></i></div>
+            <div class="stat-card-content">
+              <div class="stat-label">Monthly Income</div>
+              <div class="stat-value" id="monthlyIncome">$0</div>
+              <div class="stat-sub">Total paid this month</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upcoming Events & Reminders -->
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 24px;">
+
+          <!-- Upcoming Events -->
+          <div class="section-box">
+            <div class="section-header">
+              <h3 class="section-title">Upcoming Events</h3>
+              <a href="#" style="font-size: 0.85rem; color: #2563eb; text-decoration: none;">View All</a>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">You have 3 events scheduled this week:</p>
+<div id="upcomingEventsList"></div>
+            <div style="background: var(--bg-dark); padding: 16px; border-radius: var(--radius); margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <div>
+                  <div style="font-weight: 600; color: var(--text-white); margin-bottom: 4px;">Tomorrow</div>
+                  <div style="color: var(--text-muted); font-size: 0.85rem;">Annual General Meeting</div>
+                  <div style="font-size: 0.8rem; color: var(--text-dim);">10:00 AM</div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn-secondary" style="flex: 1;">Details</button>
+                <button class="btn-primary" style="flex: 1;">Confirm Venue</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reminders -->
+          <div class="section-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <h3 class="section-title">Reminders</h3>
+              <span style="background: var(--danger); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700;">5</span>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">Items requiring your attention</p>
+            <div style="background: var(--bg-dark); padding: 14px; border-radius: var(--radius); display: flex; gap: 12px;">
+              <div style="background: var(--success); width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px;"></div>
+              <div style="flex: 1;">
+                <div style="font-weight: 600; color: var(--text-white); margin-bottom: 4px;">Blog Post Review</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px;">Review and publish quarterly update post</div>
+                <button class="btn-primary" style="font-size: 0.75rem; padding: 6px 12px;">Review Post</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ═══════════════════════════ MEMBERS TAB ═══════════════════════════ -->
+      <div id="members-tab" class="tab-content">
+
+        <div class="section-box">
+          <div class="section-header">
+            <div>
+              <h3 class="section-title">Member Management</h3>
+              <p class="section-subtitle">Manage your organization members</p>
+            </div>
+            <button class="btn-primary" onclick="openModal('addMemberModal')"><i class="bi bi-plus me-2"></i>Add Member</button>
+          </div>
+
+          <div class="controls-row">
+            <input type="text" id="memberSearch" class="search-bar" placeholder="Search members..." onkeyup="searchMembers()">
+            <button class="btn-secondary" style="margin-left: auto;"><i class="bi bi-download me-2"></i>Export</button>
+            <button class="btn-secondary"><i class="bi bi-upload me-2"></i>Import</button>
+            <button class="btn-secondary"><i class="bi bi-list me-2"></i>Bulk Actions <i class="bi bi-chevron-down"></i></button>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th><input type="checkbox"></th>
+                  <th>Member</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Join Date</th>
+                  <th>Last Active</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="membersTableBody">
+                <tr><td colspan="7" style="text-align:center;color:var(--text-muted);">Loading members...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pagination-info" id="membersInfo">Showing members...</div>
+          <div class="pagination-controls" id="paginationControls">
+            <button class="pagination-btn"><i class="bi bi-chevron-left"></i></button>
+            <button class="pagination-btn active">1</button>
+            <button class="pagination-btn">2</button>
+            <button class="pagination-btn">3</button>
+            <button class="pagination-btn">...</button>
+            <button class="pagination-btn">35</button>
+            <button class="pagination-btn"><i class="bi bi-chevron-right"></i></button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ═══════════════════════════ EVENTS TAB ═══════════════════════════ -->
+      <div id="events-tab" class="tab-content">
+
+        <div class="section-box">
+          <div class="section-header">
+            <div>
+              <h3 class="section-title">Event Management</h3>
+              <p class="section-subtitle">Create and manage organization events</p>
+            </div>
+            <button class="btn-primary" onclick="openModal('createEventModal')"><i class="bi bi-plus me-2"></i>Create Event</button>
+          </div>
+
+          <div class="controls-row">
+            <button class="btn-primary" style="background: transparent; color: #2563eb; border: 1px solid #2563eb;"><i class="bi bi-list-ul me-2"></i>List View</button>
+            <button class="btn-secondary"><i class="bi bi-calendar me-2"></i>Calendar View</button>
+            <input type="text" class="search-bar" placeholder="Search events..." style="margin-left: auto; width: auto; flex: 1; max-width: 300px;">
+            <button class="btn-secondary"><i class="bi bi-download me-2"></i>Export</button>
+            <button class="btn-secondary"><i class="bi bi-funnel me-2"></i>Filter <i class="bi bi-chevron-down"></i></button>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Event</th>
+                  <th>Date & Time</th>
+                  <th>Location</th>
+                  <th>Status</th>
+                  <th>Attendees</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="eventsTableBody">
+                <tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Loading events...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pagination-info">Showing 1 to 6 of 8 events</div>
+          <div class="pagination-controls">
+            <button class="pagination-btn"><i class="bi bi-chevron-left"></i></button>
+            <button class="pagination-btn active">1</button>
+            <button class="pagination-btn">2</button>
+            <button class="pagination-btn"><i class="bi bi-chevron-right"></i></button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ═══════════════════════════ BLOG TAB ═══════════════════════════ -->
+      <div id="blog-tab" class="tab-content">
+
+        <div class="section-box">
+          <div class="section-header">
+            <div>
+              <h3 class="section-title">Blog & Announcements</h3>
+              <p class="section-subtitle">Manage your organization's content</p>
+            </div>
+            <button class="btn-primary" onclick="openModal('createPostModal')"><i class="bi bi-plus me-2"></i>Create Post</button>
+          </div>
+
+          <div class="controls-row">
+            <input type="text" class="search-bar" placeholder="Search posts...">
+            <label style="font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
+              Status: <select class="filter-select"><option>All</option></select>
+            </label>
+            <label style="font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
+              Category: <select class="filter-select"><option>All</option></select>
+            </label>
+          </div>
+
+          <div class="blog-cards" id="blogCardsContainer">
+            <div style="text-align:center;color:var(--text-muted);padding:40px;">Loading posts...</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ═══════════════════════════ PAYMENTS TAB ═══════════════════════════ -->
+      <div id="payments-tab" class="tab-content">
+        <div class="section-box">
+          <div class="section-header">
+            <div>
+              <h3 class="section-title">Payment Management</h3>
+              <p class="section-subtitle">Track and manage member payments</p>
+            </div>
+            <button class="btn-primary" onclick="openModal('recordPaymentModal')"><i class="bi bi-plus me-2"></i>Record Payment</button>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Member</th>
+                  <th>Amount</th>
+                  <th>Type</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="paymentsTableBody">
+                <tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Loading payments...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════ UPGRADE TAB ═══════════════════════════ -->
+      <div id="upgrade-tab" class="tab-content">
+
+        <div style="margin-bottom: 28px;">
+          <h2 style="text-align: center; margin-bottom: 8px;">Upgrade Your Plan</h2>
+          <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem;">Personal</p>
+        </div>
+
+        <div class="pricing-cards">
+          <div class="pricing-card">
+            <div class="pricing-card-name">Basic</div>
+            <div class="pricing-card-desc">Free forever plan</div>
+            <div class="pricing-card-price">$0.00<span style="font-size: 0.8rem; color: var(--text-muted);">/month</span></div>
+            <ul class="pricing-card-features">
+              <li>Up to 5 members</li>
+              <li>Priority support</li>
+              <li>Secure system access</li>
+            </ul>
+            <div class="pricing-card-current">Your Current Plan</div>
+          </div>
+
+          <div class="pricing-card">
+            <div class="pricing-card-name">Pro</div>
+            <div class="pricing-card-desc">Monthly plan</div>
+            <div class="pricing-card-price">$25.00<span style="font-size: 0.8rem; color: var(--text-muted);">/month</span></div>
+            <ul class="pricing-card-features">
+              <li>Up to 500 members</li>
+              <li>Priority support</li>
+              <li>Secure system access</li>
+            </ul>
+            <button class="btn-primary pricing-card-btn">Get Pro</button>
+          </div>
+
+          <div class="pricing-card">
+            <div class="pricing-card-name">Enterprise</div>
+            <div class="pricing-card-desc">Yearly plan</div>
+            <div class="pricing-card-price">$50.00<span style="font-size: 0.8rem; color: var(--text-muted);">/month</span></div>
+            <ul class="pricing-card-features">
+              <li>Up to 5000 members</li>
+              <li>Priority support</li>
+              <li>Secure system access</li>
+            </ul>
+            <button class="btn-primary pricing-card-btn">Get Enterprise</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ═══════════════════════════ REPORTS TAB ═══════════════════════════ -->
+      <div id="reports-tab" class="tab-content">
+
+        <div class="stat-cards-row" style="margin-bottom:24px;">
+          <div class="stat-card">
+            <div class="stat-card-icon"><i class="bi bi-people-fill"></i></div>
+            <div class="stat-card-content">
+              <div class="stat-label">Member Growth</div>
+              <div class="stat-value" id="reportMemberCount">0</div>
+              <div class="stat-sub">Total members</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon"><i class="bi bi-calendar-check"></i></div>
+            <div class="stat-card-content">
+              <div class="stat-label">Total Events</div>
+              <div class="stat-value" id="reportEventCount">0</div>
+              <div class="stat-sub">Events created</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon"><i class="bi bi-cash-stack"></i></div>
+            <div class="stat-card-content">
+              <div class="stat-label">Total Revenue</div>
+              <div class="stat-value" id="reportRevenue">$0</div>
+              <div class="stat-sub">All payments</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon"><i class="bi bi-newspaper"></i></div>
+            <div class="stat-card-content">
+              <div class="stat-label">Blog Posts</div>
+              <div class="stat-value" id="reportBlogCount">0</div>
+              <div class="stat-sub">Published posts</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Member Activity Log -->
+        <div class="section-box">
+          <div class="section-header">
+            <h3 class="section-title">Member Activity Log</h3>
+            <button class="btn-secondary" onclick="exportCSV()">
+              <i class="bi bi-download me-2"></i>Export CSV
+            </button>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Member</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Join Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="reportMembersTable">
+                <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Payment Report -->
+        <div class="section-box">
+          <div class="section-header">
+            <h3 class="section-title">Payment Report</h3>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <input type="date" id="reportDateFrom" style="background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:8px;border-radius:6px;font-family:Inter,sans-serif;">
+              <span style="color:var(--text-muted);">to</span>
+              <input type="date" id="reportDateTo" style="background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:8px;border-radius:6px;font-family:Inter,sans-serif;">
+              <button class="btn-primary" onclick="filterPaymentReport()" style="padding:8px 12px;">Filter</button>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Member</th>
+                  <th>Amount</th>
+                  <th>Type</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="reportPaymentsTable">
+                <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ═══════════════════════════ SETTINGS TAB ═══════════════════════════ -->
+      <div id="settings-tab" class="tab-content">
+
+        <!-- Organization Settings -->
+        <div class="section-box">
+          <div class="section-header">
+            <div>
+              <h3 class="section-title">Organization Settings</h3>
+              <p class="section-subtitle">Update your organization information</p>
+            </div>
+            <button class="btn-primary" onclick="saveOrgSettings()">
+              <i class="bi bi-save me-2"></i>Save Changes
+            </button>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div>
+              <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;color:var(--text-white);">Organization Name</label>
+              <input id="settingOrgName" type="text" placeholder="Your organization name"
+                style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+            </div>
+            <div>
+              <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;color:var(--text-white);">Organization Email</label>
+              <input id="settingOrgEmail" type="email" placeholder="org@example.com"
+                style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+            </div>
+            <div>
+              <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;color:var(--text-white);">Phone Number</label>
+              <input id="settingOrgPhone" type="tel" placeholder="+251..."
+                style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+            </div>
+            <div>
+              <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;color:var(--text-white);">Organization Type</label>
+              <select id="settingOrgType"
+                style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+                <option value="Corporate">Corporate</option>
+                <option value="Non-Profit">Non-Profit</option>
+                <option value="Government">Government</option>
+                <option value="Startup">Startup</option>
+                <option value="Educational">Educational</option>
+              </select>
+            </div>
+          </div>
+          <div id="settingsMsg" style="margin-top:16px;display:none;padding:10px;border-radius:var(--radius);font-size:0.85rem;"></div>
+        </div>
+
+        <!-- Admin Account Settings -->
+        <div class="section-box">
+          <div class="section-header">
+            <div>
+              <h3 class="section-title">Admin Account</h3>
+              <p class="section-subtitle">Update your personal information</p>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div>
+              <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;color:var(--text-white);">Full Name</label>
+              <input id="settingAdminName" type="text" placeholder="Your full name"
+                style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+            </div>
+            <div>
+              <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;color:var(--text-white);">Email Address</label>
+              <input id="settingAdminEmail" type="email" placeholder="your@email.com"
+                style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Change Password -->
+        <div class="section-box">
+          <div class="section-header">
+            <div>
+              <h3 class="section-title">Change Password</h3>
+              <p class="section-subtitle">Keep your account secure</p>
+            </div>
+            <button class="btn-primary" onclick="changePassword()">
+              <i class="bi bi-lock me-2"></i>Update Password
+            </button>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+            <div>
+              <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;color:var(--text-white);">Current Password</label>
+              <input id="currentPassword" type="password" placeholder="••••••••"
+                style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+            </div>
+            <div>
+              <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;color:var(--text-white);">New Password</label>
+              <input id="newPassword" type="password" placeholder="••••••••"
+                style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+            </div>
+            <div>
+              <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;color:var(--text-white);">Confirm New Password</label>
+              <input id="confirmNewPassword" type="password" placeholder="••••••••"
+                style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+            </div>
+          </div>
+          <div id="passwordMsg" style="margin-top:16px;display:none;padding:10px;border-radius:var(--radius);font-size:0.85rem;"></div>
+        </div>
+
+        <!-- Subscription Plan -->
+        <div class="section-box">
+          <div class="section-header">
+            <h3 class="section-title">Current Subscription</h3>
+            <button class="btn-primary" onclick="switchTab('upgrade')">
+              <i class="bi bi-arrow-up me-2"></i>Upgrade Plan
+            </button>
+          </div>
+          <div style="display:flex;align-items:center;gap:20px;background:var(--bg-dark);padding:20px;border-radius:var(--radius);">
+            <div style="width:50px;height:50px;background:var(--accent-light);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:var(--accent);">
+              <i class="bi bi-star-fill"></i>
+            </div>
+            <div>
+              <div id="currentPlan" style="font-size:1.1rem;font-weight:700;color:var(--text-white);">Basic Plan</div>
+              <div style="font-size:0.85rem;color:var(--text-muted);">Free forever — Up to 5 members</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  
+
+  <!-- ═══ EDIT MEMBER MODAL ═══ -->
+  <div class="modal-overlay" id="editMemberModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;align-items:center;justify-content:center;">
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;max-width:450px;width:90%;">
+      <h2 style="font-size:1.2rem;margin-bottom:20px;">Edit Member</h2>
+      <input type="hidden" id="editMemberId">
+      <div style="margin-bottom:14px;">
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;color:var(--text-white);">Full Name</label>
+        <input id="editMemberName" type="text" style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;color:var(--text-white);">Phone</label>
+        <input id="editMemberPhone" type="tel" style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;color:var(--text-white);">Role</label>
+        <select id="editMemberRole" style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+          <option value="member">Member</option>
+          <option value="treasurer">Treasurer</option>
+          <option value="secretary">Secretary</option>
+          <option value="board_member">Board Member</option>
+        </select>
+      </div>
+      <div style="margin-bottom:20px;">
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;color:var(--text-white);">Status</label>
+        <select id="editMemberStatus" style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:flex-end;">
+        <button onclick="closeModal('editMemberModal')" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:10px 16px;border-radius:var(--radius);cursor:pointer;font-family:Inter,sans-serif;">Cancel</button>
+        <button onclick="updateMember()" style="background:#2563eb;border:none;color:white;padding:10px 16px;border-radius:var(--radius);font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ CREATE POST MODAL ═══ -->
+  <div class="modal-overlay" id="createPostModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;align-items:center;justify-content:center;">
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;max-width:500px;width:90%;max-height:90vh;overflow-y:auto;">
+      <h2 style="font-size:1.2rem;margin-bottom:20px;">Create Blog Post</h2>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;color:var(--text-white);">Title</label>
+        <input id="postTitle" type="text" placeholder="Post title..." style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;color:var(--text-white);">Category</label>
+        <select id="postCategory" style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+          <option value="General">General</option>
+          <option value="Urgent">Urgent</option>
+          <option value="Update">Update</option>
+        </select>
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;color:var(--text-white);">Content</label>
+        <textarea id="postContent" rows="5" placeholder="Write your post..." style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;"></textarea>
+      </div>
+      <div style="margin-bottom:20px;">
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;color:var(--text-white);">Status</label>
+        <select id="postStatus" style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+          <option value="draft">Draft</option>
+          <option value="published">Published</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:flex-end;">
+        <button onclick="closeModal('createPostModal')" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:10px 16px;border-radius:var(--radius);cursor:pointer;font-family:Inter,sans-serif;">Cancel</button>
+        <button onclick="createPost()" style="background:#2563eb;border:none;color:white;padding:10px 16px;border-radius:var(--radius);font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">Publish Post</button>
+      </div>
+    </div>
+  </div>
+  <!-- ═══ ADD MEMBER MODAL ═══ -->
+  <div class="modal-overlay" id="addMemberModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;align-items:center;justify-content:center;">
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;max-width:450px;width:90%;">
+      <h2 style="font-size:1.2rem;margin-bottom:20px;">Add New Member</h2>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;">Full Name</label>
+        <input id="newMemberName" type="text" placeholder="John Doe" style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;">Email</label>
+        <input id="newMemberEmail" type="email" placeholder="john@example.com" style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;">Phone</label>
+        <input id="newMemberPhone" type="tel" placeholder="+251..." style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+      </div>
+      <div style="margin-bottom:20px;">
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;">Role</label>
+        <select id="newMemberRole" style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+          <option value="member">Member</option>
+          <option value="treasurer">Treasurer</option>
+          <option value="secretary">Secretary</option>
+          <option value="board_member">Board Member</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:flex-end;">
+        <button onclick="closeModal('addMemberModal')" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:10px 16px;border-radius:var(--radius);cursor:pointer;font-family:Inter,sans-serif;">Cancel</button>
+        <button onclick="addMember()" style="background:#2563eb;border:none;color:white;padding:10px 16px;border-radius:var(--radius);font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">Add Member</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ CREATE EVENT MODAL ═══ -->
+  <div class="modal-overlay" id="createEventModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;align-items:center;justify-content:center;">
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;max-width:450px;width:90%;max-height:90vh;overflow-y:auto;">
+      <h2 style="font-size:1.2rem;margin-bottom:20px;">Create Event</h2>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;">Event Title</label>
+        <input id="eventTitle" type="text" placeholder="Board Meeting" style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;">Event Type</label>
+        <select id="eventType" style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+          <option value="Meeting">Meeting</option>
+          <option value="Volunteer">Volunteer</option>
+          <option value="Fundraiser">Fundraiser</option>
+          <option value="Training">Training</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;">Location</label>
+        <input id="eventLocation" type="text" placeholder="Conference Room A" style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;">Start Date & Time</label>
+        <input id="eventStartTime" type="datetime-local" style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;">End Date & Time</label>
+        <input id="eventEndTime" type="datetime-local" style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;">Max Attendees</label>
+        <input id="eventMaxAttendees" type="number" value="50" style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;">RSVP Deadline</label>
+        <input id="eventRsvpDeadline" type="datetime-local" style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+      </div>
+      <div style="margin-bottom:20px;">
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;">Description</label>
+        <textarea id="eventDescription" rows="3" placeholder="Event details..." style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;"></textarea>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:flex-end;">
+        <button onclick="closeModal('createEventModal')" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:10px 16px;border-radius:var(--radius);cursor:pointer;font-family:Inter,sans-serif;">Cancel</button>
+        <button onclick="submitCreateEvent()" style="background:#2563eb;border:none;color:white;padding:10px 16px;border-radius:var(--radius);font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">Create Event</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ RECORD PAYMENT MODAL ═══ -->
+  <div class="modal-overlay" id="recordPaymentModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;align-items:center;justify-content:center;">
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;max-width:450px;width:90%;">
+      <h2 style="font-size:1.2rem;margin-bottom:20px;">Record Payment</h2>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;">Member</label>
+        <select id="paymentMember" style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+          <option value="">Select member</option>
+        </select>
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;">Amount</label>
+        <input id="paymentAmount" type="number" placeholder="50.00" step="0.01" style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;">Payment Type</label>
+        <select id="paymentType" style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+          <option value="membership">Membership Fee</option>
+          <option value="event">Event Registration</option>
+          <option value="donation">Donation</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div style="margin-bottom:20px;">
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:6px;">Status</label>
+        <select id="paymentStatus" style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+          <option value="paid">Paid</option>
+          <option value="pending">Pending</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:flex-end;">
+        <button onclick="closeModal('recordPaymentModal')" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:10px 16px;border-radius:var(--radius);cursor:pointer;font-family:Inter,sans-serif;">Cancel</button>
+        <button onclick="recordPayment()" style="background:#2563eb;border:none;color:white;padding:10px 16px;border-radius:var(--radius);font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">Record Payment</button>
+      </div>
+    </div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="theme-toggle.js"></script>
+
+<script>
+  // ── Global Variables ──
+  let currentOrgId  = null;
+  let currentUser   = null;
+
+  // ── When page loads, get logged in user info ──
+  window.addEventListener('load', function () {
+    fetch('http://localhost:3000/api/auth/me', {
+      credentials: 'include'
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      currentUser = data.user;
+
+      // Update name in header and sidebar
+      document.getElementById('adminName').textContent     = currentUser.full_name;
+      document.getElementById('sidebarName').textContent   = currentUser.full_name;
+      document.getElementById('dropdownName').textContent  = currentUser.full_name;
+
+      // Get org ID for this admin
+      fetch(`http://localhost:3000/api/organizations/mine`, {
+        credentials: 'include'
+      })
+      .then(res => res.json())
+      .then(orgData => {
+        if (orgData.success) {
+          currentOrgId = orgData.org.id;
+          document.getElementById('orgName').textContent = orgData.org.name;
+          // Load all initial data
+          loadDashboard();
+          loadMembers();
+          loadEvents();
+          loadBlog();
+          loadPayments();
+          loadPaymentMembers();
+        } else {
+          // orgadmin has no org yet — still show dashboard
+          loadDashboard();
+        }
+      });
+    })
+    .catch(() => {
+      window.location.href = 'login.html';
+    });
+  });
+
+  // ══════════════════════════════════════════
+  // DASHBOARD
+  // ══════════════════════════════════════════
+  function loadDashboard() {
+    loadMonthlyIncome();
+    // Load member count
+    fetch(`http://localhost:3000/api/members?org_id=${currentOrgId}&limit=1`, {
+      credentials: 'include'
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        document.getElementById('totalMembers').textContent = data.total;
+      }
+    });
+
+    // Load events count
+    fetch(`http://localhost:3000/api/events?org_id=${currentOrgId}&limit=1`, {
+      credentials: 'include'
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        document.getElementById('totalEvents').textContent = data.total;
+        // Show upcoming events in dashboard
+        loadUpcomingEvents(data.events);
+      }
+    });
+  }
+
+  function loadUpcomingEvents(events) {
+    const container = document.getElementById('upcomingEventsList');
+    if (!events || events.length === 0) {
+      container.innerHTML = '<p style="color:var(--text-muted)">No upcoming events</p>';
+      return;
+    }
+    container.innerHTML = events.map(e => `
+      <div style="padding: 12px 0; border-bottom: 1px solid var(--border);">
+        <div style="font-weight:600; color:var(--text-white);">${e.title}</div>
+        <div style="font-size:0.8rem; color:var(--text-dim);">${new Date(e.start_time).toLocaleString()}</div>
+        <div style="font-size:0.8rem; color:var(--text-muted);">${e.location || ''}</div>
+      </div>
+    `).join('');
+  }
+
+  // ══════════════════════════════════════════
+  // MEMBERS
+  // ══════════════════════════════════════════
+  let currentPage = 1;
+
+  function loadMembers(page = 1, search = '') {
+    currentPage = page;
+    fetch(`http://localhost:3000/api/members?org_id=${currentOrgId}&page=${page}&search=${search}`, {
+      credentials: 'include'
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success) return;
+
+      // Update table
+      const tbody = document.getElementById('membersTableBody');
+      if (data.members.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted);">No members found</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = data.members.map(m => `
+        <tr>
+          <td><input type="checkbox"></td>
+          <td>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="width:36px;height:36px;border-radius:50%;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent);">
+                ${m.full_name.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <div style="font-weight:600;">${m.full_name}</div>
+                <div style="font-size:0.8rem;color:var(--text-dim);">${m.email}</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="badge badge-member">${m.role_in_org}</span></td>
+          <td><span class="badge ${m.status === 'active' ? 'badge-active' : 'badge-inactive'}">${m.status}</span></td>
+          <td>${new Date(m.join_date).toLocaleDateString()}</td>
+          <td>${getTimeAgo(m.last_active)}</td>
+          <td>
+            <button onclick="openEditMember(${m.id}, '${m.full_name}', '${m.phone || ''}', '${m.role_in_org}', '${m.status}')" style="background:transparent;border:none;color:#2563eb;cursor:pointer;font-size:1rem;margin-right:8px;">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button onclick="deleteMember(${m.id})" style="background:transparent;border:none;color:var(--danger);cursor:pointer;font-size:1rem;">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      // Update pagination
+      document.getElementById('membersInfo').textContent =
+        `Showing ${(page-1)*7+1} to ${Math.min(page*7, data.total)} of ${data.total} members`;
+
+      // Build pagination buttons
+      buildPagination(data.pages, page);
+      loadPaymentMembers();
+    });
+  }
+
+  function buildPagination(totalPages, currentPage) {
+    const container = document.getElementById('paginationControls');
+    let html = `<button class="pagination-btn" onclick="loadMembers(${currentPage-1})" ${currentPage===1?'disabled':''}>
+                  <i class="bi bi-chevron-left"></i></button>`;
+
+    for (let i = 1; i <= Math.min(totalPages, 5); i++) {
+      html += `<button class="pagination-btn ${i===currentPage?'active':''}" onclick="loadMembers(${i})">${i}</button>`;
+    }
+
+    html += `<button class="pagination-btn" onclick="loadMembers(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>
+               <i class="bi bi-chevron-right"></i></button>`;
+
+    container.innerHTML = html;
+  }
+
+  function loadPaymentMembers() {
+    const select = document.getElementById('paymentMember');
+    if (!select) return;
+
+    fetch(`http://localhost:3000/api/members?org_id=${currentOrgId}&limit=1000`, {
+      credentials: 'include'
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success) return;
+      select.innerHTML = '<option value="">Select member</option>' +
+        data.members.map(m => `<option value="${m.id}">${m.full_name} (${m.email})</option>`).join('');
+    })
+    .catch(err => {
+      console.error('Load payment members error:', err);
+    });
+  }
+
+  function getTimeAgo(date) {
+    const diff = Math.floor((new Date() - new Date(date)) / 1000 / 60);
+    if (diff < 60)   return `${diff} mins ago`;
+    if (diff < 1440) return `${Math.floor(diff/60)} hours ago`;
+    return `${Math.floor(diff/1440)} days ago`;
+  }
+
+  // Search members
+  function searchMembers() {
+    const search = document.getElementById('memberSearch').value;
+    loadMembers(1, search);
+  }
+
+  // Add Member
+  function addMember() {
+    const full_name   = document.getElementById('newMemberName').value.trim();
+    const email       = document.getElementById('newMemberEmail').value.trim();
+    const phone       = document.getElementById('newMemberPhone').value.trim();
+    const role_in_org = document.getElementById('newMemberRole').value;
+
+    if (!full_name || !email) {
+      alert('Name and email are required!');
+      return;
+    }
+
+    fetch('http://localhost:3000/api/members', {
+      method:      'POST',
+      headers:     { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ full_name, email, phone, role_in_org, org_id: currentOrgId })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        closeModal('addMemberModal');
+        loadMembers();
+        loadDashboard();
+        loadPaymentMembers();
+        alert('✅ Member added successfully!');
+      } else {
+        alert('❌ ' + data.message);
+      }
+    });
+  }
+
+  // Delete Member
+  function deleteMember(userId) {
+    if (!confirm('Are you sure you want to remove this member?')) return;
+
+    fetch(`http://localhost:3000/api/members/${userId}`, {
+      method:      'DELETE',
+      headers:     { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ org_id: currentOrgId })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        loadMembers();
+        loadDashboard();
+        alert('✅ Member removed!');
+      } else {
+        alert('❌ ' + data.message);
+      }
+    });
+  }
+
+  // ══════════════════════════════════════════
+  // EVENTS
+  // ══════════════════════════════════════════
+  function loadEvents() {
+    fetch(`http://localhost:3000/api/events?org_id=${currentOrgId}`, {
+      credentials: 'include'
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success) return;
+
+      const tbody = document.getElementById('eventsTableBody');
+      if (data.events.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);">No events yet</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = data.events.map(e => `
+        <tr>
+          <td style="font-weight:600;">${e.title}</td>
+          <td>${new Date(e.start_time).toLocaleString()}</td>
+          <td>${e.location || '-'}</td>
+          <td><span class="badge badge-${e.status === 'published' ? 'active' : 'draft'}">${e.status}</span></td>
+          <td>
+            <div style="width:100px;height:6px;background:var(--bg-dark);border-radius:3px;overflow:hidden;">
+              <div style="width:${Math.min((e.attendee_count/e.max_attendees)*100,100)}%;height:100%;background:#2563eb;"></div>
+            </div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">${e.attendee_count}/${e.max_attendees}</div>
+          </td>
+          <td>
+            <button onclick="deleteEvent(${e.id})" style="background:transparent;border:none;color:var(--danger);cursor:pointer;">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    });
+  }
+
+  function submitCreateEvent() {
+    const title         = document.getElementById('eventTitle').value.trim();
+    const event_type    = document.getElementById('eventType').value;
+    const location      = document.getElementById('eventLocation').value.trim();
+    const start_time    = document.getElementById('eventStartTime').value;
+    const end_time      = document.getElementById('eventEndTime').value;
+    const max_attendees = document.getElementById('eventMaxAttendees').value;
+    const description   = document.getElementById('eventDescription').value.trim();
+
+    if (!title || !start_time) {
+      alert('Title and start time are required!');
+      return;
+    }
+    const payload = { org_id: currentOrgId, title, event_type, location, start_time, end_time, max_attendees, description };
+    console.log('Creating event, payload:', payload);
+
+    fetch('http://localhost:3000/api/events', {
+      method:      'POST',
+      headers:     { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(payload)
+    })
+    .then(async res => {
+      // Try to parse JSON, but handle non-JSON responses
+      let data = null;
+      try {
+        data = await res.json();
+      } catch (e) {
+        console.error('Create event: failed to parse JSON response', e, res);
+        alert('Server error or non-JSON response (status ' + res.status + '). See console for details.');
+        return;
+      }
+
+      if (res.ok && data && data.success) {
+        closeModal('createEventModal');
+        loadEvents();
+        loadDashboard();
+        alert('✅ Event created!');
+      } else {
+        console.error('Create event failed:', data);
+        alert('❌ ' + (data && data.message ? data.message : JSON.stringify(data)));
+      }
+    })
+    .catch(err => {
+      console.error('Network or fetch error creating event:', err);
+      alert('Network error while creating event. Check console for details.');
+    });
+  }
+
+  function deleteEvent(id) {
+    if (!confirm('Delete this event?')) return;
+    fetch(`http://localhost:3000/api/events/${id}`, {
+      method: 'DELETE', credentials: 'include'
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) { loadEvents(); alert('✅ Event deleted!'); }
+    });
+  }
+
+  // ══════════════════════════════════════════
+  // PAYMENTS
+  // ══════════════════════════════════════════
+  function loadPayments() {
+    fetch(`http://localhost:3000/api/payments?org_id=${currentOrgId}`, {
+      credentials: 'include'
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success) return;
+
+      const tbody = document.getElementById('paymentsTableBody');
+      if (data.payments.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);">No payments yet</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = data.payments.map(p => `
+        <tr>
+          <td style="font-weight:600;">${p.full_name}</td>
+          <td>$${p.amount}</td>
+          <td>${p.payment_type}</td>
+          <td>${p.created_at ? new Date(p.created_at).toLocaleDateString() : '-'}</td>
+          <td><span class="badge badge-${p.status === 'paid' ? 'active' : p.status === 'pending' ? 'pending' : 'inactive'}">${p.status}</span></td>
+          <td>
+            ${p.status !== 'paid' ? `
+            <button onclick="markPaid(${p.id})" style="background:var(--success);border:none;color:white;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:0.75rem;">
+              Mark Paid
+            </button>` : '✅'}
+          </td>
+        </tr>
+      `).join('');
+    });
+  }
+
+  function recordPayment() {
+    const user_id      = parseInt(document.getElementById('paymentMember').value, 10);
+    const amount       = parseFloat(document.getElementById('paymentAmount').value);
+    const payment_type = document.getElementById('paymentType').value;
+    const status       = document.getElementById('paymentStatus').value;
+
+    if (!user_id || isNaN(amount) || amount <= 0) {
+      alert('Member and valid amount are required!');
+      return;
+    }
+
+    fetch('http://localhost:3000/api/payments', {
+      method:      'POST',
+      headers:     { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ org_id: currentOrgId, user_id, amount, payment_type, status })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        closeModal('recordPaymentModal');
+        loadPayments();
+        alert('✅ Payment recorded!');
+      } else {
+        alert('❌ ' + data.message);
+      }
+    });
+  }
+
+  function markPaid(id) {
+    fetch(`http://localhost:3000/api/payments/${id}`, {
+      method:      'PUT',
+      headers:     { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ status: 'paid' })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) { loadPayments(); }
+    });
+  }
+
+  // ══════════════════════════════════════════
+  // TAB SWITCHING
+  // ══════════════════════════════════════════
+  function switchTab(tabName, clickedEl) {
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.menu-link').forEach(link => link.classList.remove('active'));
+
+    document.getElementById(tabName + '-tab').classList.add('active');
+
+    // Mark the clicked sidebar item active
+    if (clickedEl) {
+      clickedEl.classList.add('active');
+    } else {
+      // Find the menu-link that references this tabName
+      document.querySelectorAll('.menu-link').forEach(link => {
+        if (link.getAttribute('onclick') && link.getAttribute('onclick').includes(`'${tabName}'`)) {
+          link.classList.add('active');
+        }
+      });
+    }
+
+    // Load data when tab opens
+    if (tabName === 'members')  loadMembers();
+    if (tabName === 'events')   loadEvents();
+    if (tabName === 'payments') { loadPayments(); loadMonthlyIncome(); }
+    if (tabName === 'blog')     loadBlog();
+    if (tabName === 'reports')  loadReports();
+    if (tabName === 'settings') loadSettings();
+  }
+
+  // ══════════════════════════════════════════
+  // MODALS
+  // ══════════════════════════════════════════
+  function openModal(id) {
+    const modal = document.getElementById(id);
+    modal.style.display = 'flex';
+  }
+  function closeModal(id) {
+    const modal = document.getElementById(id);
+    modal.style.display = 'none';
+  }
+
+  // Close modal when clicking outside
+  document.querySelectorAll('.modal-overlay').forEach(modal => {
+    modal.addEventListener('click', function(e) {
+      if (e.target === this) this.style.display = 'none';
+    });
+  });
+
+  // ══════════════════════════════════════════
+  // USER DROPDOWN
+  // ══════════════════════════════════════════
+  function toggleUserDropdown() {
+    document.getElementById('userDropdown').classList.toggle('show');
+  }
+
+  document.addEventListener('click', function(e) {
+    const wrapper = document.querySelector('.user-dropdown-wrapper');
+    if (wrapper && !wrapper.contains(e.target)) {
+      document.getElementById('userDropdown').classList.remove('show');
+    }
+  });
+
+
+  // ══════════════════════════════════════════
+  // BLOG FUNCTIONS
+  // ══════════════════════════════════════════
+  function loadBlog() {
+    fetch(`http://localhost:3000/api/blog?org_id=${currentOrgId}`, {
+      credentials: 'include'
+    })
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById('blogCardsContainer');
+      if (!data.success || data.posts.length === 0) {
+        container.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:40px;">No posts yet. Create your first post!</div>';
+        document.getElementById('reportBlogCount').textContent = 0;
+        if (document.getElementById('totalBlogs')) {
+          document.getElementById('totalBlogs').textContent = 0;
+        }
+        return;
+      }
+      container.innerHTML = data.posts.map(p => `
+        <div class="blog-card">
+          <h3 class="blog-card-title">${p.title}</h3>
+          <div class="blog-card-meta">${p.author_name} • ${new Date(p.created_at).toLocaleDateString()}</div>
+          <p class="blog-card-excerpt">${p.content.substring(0, 100)}...</p>
+          <div class="blog-card-tags">
+            <span class="blog-tag badge-general">${p.category}</span>
+            <span class="blog-tag ${p.status === 'published' ? 'badge-published' : 'badge-draft'}">${p.status}</span>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            <button onclick="deletePost(${p.id})" style="background:transparent;border:1px solid var(--danger);color:var(--danger);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:0.75rem;font-family:Inter,sans-serif;">
+              <i class="bi bi-trash"></i> Delete
+            </button>
+            <button onclick="togglePublish(${p.id}, '${p.status}', ${JSON.stringify(p.title)}, ${JSON.stringify(p.content)}, '${p.category}')" style="background:transparent;border:1px solid var(--success);color:var(--success);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:0.75rem;font-family:Inter,sans-serif;">
+              ${p.status === 'draft' ? '📢 Publish' : '📝 Unpublish'}
+            </button>
+          </div>
+        </div>
+      `).join('');
+      document.getElementById('reportBlogCount').textContent = data.posts.length;
+      if (document.getElementById('totalBlogs')) {
+        document.getElementById('totalBlogs').textContent = data.posts.length;
+      }
+    });
+  }
+
+  function createPost() {
+    const title    = document.getElementById('postTitle').value.trim();
+    const content  = document.getElementById('postContent').value.trim();
+    const category = document.getElementById('postCategory').value;
+    const status   = document.getElementById('postStatus').value;
+
+    if (!title || !content) { alert('Title and content are required!'); return; }
+
+    fetch('http://localhost:3000/api/blog', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ org_id: currentOrgId, title, content, category, status })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        closeModal('createPostModal');
+        document.getElementById('postTitle').value   = '';
+        document.getElementById('postContent').value = '';
+        alert('✅ Post created!');
+        loadBlog();
+      } else {
+        console.error('Create blog error:', data);
+        alert('❌ ' + (data.message || 'Could not create post'));
+      }
+    })
+    .catch(err => {
+      console.error('Create blog network error:', err);
+      alert('Network error creating blog post. See console for details.');
+    });
+  }
+
+  function deletePost(id) {
+    if (!confirm('Delete this post?')) return;
+    fetch(`http://localhost:3000/api/blog/${id}`, {
+      method: 'DELETE', credentials: 'include'
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        loadBlog();
+      } else {
+        console.error('Delete blog error:', data);
+        alert('Could not delete post.');
+      }
+    })
+    .catch(err => {
+      console.error('Delete blog network error:', err);
+      alert('Network error deleting post.');
+    });
+  }
+
+  function togglePublish(id, currentStatus, currentTitle, currentContent, currentCategory) {
+    const newStatus = currentStatus === 'draft' ? 'published' : 'draft';
+    fetch(`http://localhost:3000/api/blog/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ title: currentTitle, content: currentContent, category: currentCategory, status: newStatus })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        loadBlog();
+      } else {
+        console.error('Publish toggle error:', data);
+        alert('Could not update post status.');
+      }
+    })
+    .catch(err => {
+      console.error('Publish toggle network error:', err);
+      alert('Network error updating post status.');
+    });
+  }
+
+  // ══════════════════════════════════════════
+  // EDIT MEMBER
+  // ══════════════════════════════════════════
+  function openEditMember(id, name, phone, role, status) {
+    document.getElementById('editMemberId').value     = id;
+    document.getElementById('editMemberName').value   = name;
+    document.getElementById('editMemberPhone').value  = phone || '';
+    document.getElementById('editMemberRole').value   = role;
+    document.getElementById('editMemberStatus').value = status;
+    openModal('editMemberModal');
+  }
+
+  function updateMember() {
+    const id       = document.getElementById('editMemberId').value;
+    const full_name = document.getElementById('editMemberName').value.trim();
+    const phone    = document.getElementById('editMemberPhone').value.trim();
+    const role_in_org = document.getElementById('editMemberRole').value;
+    const status   = document.getElementById('editMemberStatus').value;
+
+    if (!full_name) { alert('Name is required!'); return; }
+
+    fetch(`http://localhost:3000/api/members/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ full_name, phone, role_in_org, status })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        closeModal('editMemberModal');
+        loadMembers();
+        alert('✅ Member updated!');
+      } else { alert('❌ ' + data.message); }
+    });
+  }
+
+  // ══════════════════════════════════════════
+  // REPORTS
+  // ══════════════════════════════════════════
+  function loadReports() {
+    // Load member count
+    fetch(`http://localhost:3000/api/members?org_id=${currentOrgId}&limit=1`, { credentials: 'include' })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        document.getElementById('reportMemberCount').textContent = data.total;
+      }
+    });
+
+    // Load events count
+    fetch(`http://localhost:3000/api/events?org_id=${currentOrgId}&limit=1`, { credentials: 'include' })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        document.getElementById('reportEventCount').textContent = data.total;
+      }
+    });
+
+    // Load payments
+    fetch(`http://localhost:3000/api/payments?org_id=${currentOrgId}`, { credentials: 'include' })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        const total = data.payments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
+        document.getElementById('reportRevenue').textContent = '$' + total.toFixed(2);
+
+        const tbody = document.getElementById('reportPaymentsTable');
+        tbody.innerHTML = data.payments.map(p => `
+          <tr>
+            <td>${p.full_name}</td>
+            <td>$${p.amount}</td>
+            <td>${p.payment_type}</td>
+            <td>${new Date(p.created_at).toLocaleDateString()}</td>
+            <td><span class="badge badge-${p.status === 'paid' ? 'active' : 'draft'}">${p.status}</span></td>
+          </tr>
+        `).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">No payments</td></tr>';
+      }
+    });
+
+    // Load members for activity log
+    fetch(`http://localhost:3000/api/members?org_id=${currentOrgId}`, { credentials: 'include' })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        const tbody = document.getElementById('reportMembersTable');
+        tbody.innerHTML = data.members.map(m => `
+          <tr>
+            <td style="font-weight:600;">${m.full_name}</td>
+            <td>${m.email}</td>
+            <td>${m.role_in_org}</td>
+            <td>${new Date(m.join_date).toLocaleDateString()}</td>
+            <td><span class="badge badge-${m.status === 'active' ? 'active' : 'draft'}">${m.status}</span></td>
+          </tr>
+        `).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">No members</td></tr>';
+      }
+    });
+
+    // Load blog count
+    fetch(`http://localhost:3000/api/blog?org_id=${currentOrgId}`, { credentials: 'include' })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        document.getElementById('reportBlogCount').textContent = data.posts.length;
+        document.getElementById('totalBlogs').textContent = data.posts.length;
+      }
+    });
+  }
+
+  function filterPaymentReport() {
+    const from = document.getElementById('reportDateFrom').value;
+    const to   = document.getElementById('reportDateTo').value;
+    if (!from || !to) { alert('Please select date range'); return; }
+
+    // Filter the payment table rows by date range
+    fetch(`http://localhost:3000/api/payments?org_id=${currentOrgId}`, { credentials: 'include' })
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success) return;
+      const fromDate = new Date(from);
+      const toDate   = new Date(to);
+      toDate.setHours(23, 59, 59, 999); // include full end day
+
+      const filtered = data.payments.filter(p => {
+        const d = new Date(p.created_at);
+        return d >= fromDate && d <= toDate;
+      });
+
+      const tbody = document.getElementById('reportPaymentsTable');
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">No payments in this date range</td></tr>';
+        return;
+      }
+      tbody.innerHTML = filtered.map(p => `
+        <tr>
+          <td>${p.full_name}</td>
+          <td>$${p.amount}</td>
+          <td>${p.payment_type}</td>
+          <td>${new Date(p.created_at).toLocaleDateString()}</td>
+          <td><span class="badge badge-${p.status === 'paid' ? 'active' : 'draft'}">${p.status}</span></td>
+        </tr>
+      `).join('');
+
+      const total = filtered.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
+      document.getElementById('reportRevenue').textContent = '$' + total.toFixed(2);
+    });
+  }
+
+  function exportCSV() {
+    fetch(`http://localhost:3000/api/members?org_id=${currentOrgId}&limit=1000`, { credentials: 'include' })
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success) return;
+      const headers = ['Name', 'Email', 'Role', 'Status', 'Join Date'];
+      const rows = data.members.map(m => [m.full_name, m.email, m.role_in_org, m.status, new Date(m.join_date).toLocaleDateString()]);
+      const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = 'members_report.csv';
+      a.click();
+    });
+  }
+
+  // ── Load Monthly Income ──
+  function loadMonthlyIncome() {
+    fetch(`http://localhost:3000/api/payments?org_id=${currentOrgId}`, { credentials: 'include' })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        const paid = data.payments.filter(p => p.status === 'paid');
+        const total = paid.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
+        document.getElementById('monthlyIncome').textContent = '$' + total.toFixed(2);
+      }
+    });
+  }
+
+  // ══════════════════════════════════════════
+  // SETTINGS FUNCTIONS
+  // ══════════════════════════════════════════
+  function loadSettings() {
+    // Pre-fill org name from sidebar
+    if (currentUser) {
+      document.getElementById('settingAdminName').value  = currentUser.full_name || '';
+      document.getElementById('settingAdminEmail').value = currentUser.email || '';
+    }
+    // Pre-fill org info
+    fetch('http://localhost:3000/api/organizations/mine', { credentials: 'include' })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        document.getElementById('settingOrgName').value  = data.org.name || '';
+        document.getElementById('settingOrgPhone').value = data.org.phone || '';
+        document.getElementById('settingOrgType').value  = data.org.org_type || '';
+        document.getElementById('currentPlan').textContent = data.org.plan + ' Plan';
+      }
+    });
+  }
+
+  function saveOrgSettings() {
+    const name     = document.getElementById('settingOrgName').value.trim();
+    const email    = document.getElementById('settingOrgEmail').value.trim();
+    const phone    = document.getElementById('settingOrgPhone').value.trim();
+    const org_type = document.getElementById('settingOrgType').value;
+
+    if (!name) { showSettingsMsg('error', 'Organization name is required!'); return; }
+
+    fetch('http://localhost:3000/api/organizations/mine', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ name, email, phone, org_type })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        showSettingsMsg('success', '✅ Organization settings saved!');
+        document.getElementById('orgName').textContent = name;
+      } else {
+        showSettingsMsg('error', '❌ ' + data.message);
+      }
+    })
+    .catch(() => showSettingsMsg('error', '❌ Network error. Try again.'));
+  }
+
+  function changePassword() {
+    const current = document.getElementById('currentPassword').value;
+    const newPass = document.getElementById('newPassword').value;
+    const confirm = document.getElementById('confirmNewPassword').value;
+
+    if (!current || !newPass || !confirm) {
+      showPasswordMsg('error', 'All password fields are required!'); return;
+    }
+    if (newPass.length < 6) {
+      showPasswordMsg('error', 'New password must be at least 6 characters!'); return;
+    }
+    if (newPass !== confirm) {
+      showPasswordMsg('error', 'New passwords do not match!'); return;
+    }
+
+    fetch('http://localhost:3000/api/auth/change-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ currentPassword: current, newPassword: newPass })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        showPasswordMsg('success', '✅ ' + data.message);
+        document.getElementById('currentPassword').value     = '';
+        document.getElementById('newPassword').value         = '';
+        document.getElementById('confirmNewPassword').value  = '';
+      } else {
+        showPasswordMsg('error', '❌ ' + data.message);
+      }
+    })
+    .catch(() => showPasswordMsg('error', '❌ Network error. Try again.'));
+  }
+
+  function showSettingsMsg(type, text) {
+    const box = document.getElementById('settingsMsg');
+    box.textContent = text;
+    box.style.display = 'block';
+    box.style.background = type === 'success' ? 'rgba(76,209,119,0.12)' : 'rgba(255,107,107,0.12)';
+    box.style.border     = type === 'success' ? '1px solid rgba(76,209,119,0.3)' : '1px solid rgba(255,107,107,0.3)';
+    box.style.color      = type === 'success' ? '#4cd177' : '#ff6b6b';
+    setTimeout(() => { box.style.display = 'none'; }, 4000);
+  }
+
+  function showPasswordMsg(type, text) {
+    const box = document.getElementById('passwordMsg');
+    box.textContent = text;
+    box.style.display = 'block';
+    box.style.background = type === 'success' ? 'rgba(76,209,119,0.12)' : 'rgba(255,107,107,0.12)';
+    box.style.border     = type === 'success' ? '1px solid rgba(76,209,119,0.3)' : '1px solid rgba(255,107,107,0.3)';
+    box.style.color      = type === 'success' ? '#4cd177' : '#ff6b6b';
+    setTimeout(() => { box.style.display = 'none'; }, 4000);
+  }
+  // ── LOGOUT ──
+  function doLogout() {
+    fetch('http://localhost:3000/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include'
+    })
+    .then(() => { window.location.href = 'login.html'; })
+    .catch(() => { window.location.href = 'login.html'; });
+  }
+</script>
+
+</body>
+</html>

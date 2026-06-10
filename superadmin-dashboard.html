@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Super Admin Dashboard — OrgMember</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg-dark:      #f8fafc;
+      --bg-card:      #ffffff;
+      --bg-card-2:    #f4f7fb;
+      --accent:       #f5a623;
+      --accent-hover: #e09520;
+      --accent-light: rgba(245,166,35,0.12);
+      --text-white:   #0b1628;
+      --text-muted:   #556c89;
+      --text-dim:     #6b7b8f;
+      --border:       rgba(15,23,42,0.08);
+      --nav-bg:       #ffffff;
+      --navbar-toggler-icon-filter: invert(0);
+      --radius:       12px;
+      --success:      #4cd177;
+      --warning:      #ffa800;
+      --danger:       #ff6b6b;
+    }
+
+    .theme-feature {
+      --bg-dark:      #0b1628;
+      --bg-card:      #11213a;
+      --bg-card-2:    #162340;
+      --accent:       #f5a623;
+      --accent-hover: #e09520;
+      --accent-light: rgba(245,166,35,0.12);
+      --text-white:   #ffffff;
+      --text-muted:   #8fa8c8;
+      --text-dim:     #5a9a9a;
+      --border:       rgba(255,255,255,0.07);
+      --nav-bg:       rgba(11,22,40,0.95);
+      --navbar-toggler-icon-filter: invert(1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg-dark);
+      color: var(--text-white);
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      min-height: 100vh;
+    }
+    h1, h2, h3 { font-family: 'Playfair Display', serif; font-weight: 700; }
+
+    .dashboard-wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 260px;
+      background: var(--bg-card);
+      border-right: 1px solid var(--border);
+      padding: 24px 16px;
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .sidebar-header {
+      margin-bottom: 32px;
+    }
+
+    .sidebar-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .sidebar-subtitle {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .menu-item {
+      margin-bottom: 8px;
+    }
+
+    .menu-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: var(--radius);
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .menu-link:hover {
+      background: rgba(245,166,35,0.1);
+      color: var(--accent);
+    }
+
+    .menu-link.active {
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    .menu-icon {
+      font-size: 1.1rem;
+      width: 20px;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+    }
+
+    .user-avatar-sm {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--accent-light);
+      border: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--accent);
+    }
+
+    .user-profile-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .user-profile-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-white);
+    }
+
+    .user-profile-role {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+
+    /* ── MAIN CONTENT ── */
+    .main-content {
+      flex: 1;
+      margin-left: 260px;
+      padding: 32px;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-white);
+      margin: 0;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .notification-badge {
+      position: relative;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: var(--text-muted);
+    }
+
+    .notification-badge::after {
+      content: attr(data-count);
+      position: absolute;
+      top: -8px;
+      right: -6px;
+      background: var(--danger);
+      color: white;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .user-dropdown-wrapper {
+      position: relative;
+    }
+
+    .user-profile-dropdown {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 0;
+    }
+
+    .user-dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      min-width: 180px;
+      margin-top: 8px;
+      display: none;
+      z-index: 1000;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .user-dropdown-menu.show {
+      display: block;
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+      border: none;
+      background: transparent;
+      width: 100%;
+      cursor: pointer;
+      text-align: left;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .dropdown-item:hover {
+      background: rgba(245,166,35,0.1);
+      color: var(--accent);
+    }
+
+    .dropdown-item.dropdown-header {
+      font-weight: 600;
+      color: var(--text-white);
+      cursor: default;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── TABS ── */
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .tab-buttons {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 28px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 14px 16px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-bottom: 2px solid transparent;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .tab-btn:hover {
+      color: var(--accent);
+    }
+
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    /* ── STAT CARDS ── */
+    .stat-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 10px;
+    }
+
+    .stat-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text-white);
+      margin-bottom: 4px;
+    }
+
+    .stat-sub {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    /* ── SECTIONS ── */
+    .section-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-white);
+      margin: 0;
+    }
+
+    /* ── BUTTONS ── */
+    .btn-primary {
+      background: var(--accent);
+      border: none;
+      color: var(--bg-dark);
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ── SEARCH & FILTERS ── */
+    .search-bar {
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      color: var(--text-white);
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      font-size: 0.9rem;
+      font-family: 'Inter', sans-serif;
+      width: 300px;
+      margin-bottom: 16px;
+    }
+
+    .search-bar::placeholder {
+      color: var(--text-dim);
+    }
+
+    .controls-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    /* ── TABLE ── */
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0;
+    }
+
+    thead {
+      background: var(--bg-card-2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      padding: 12px 14px;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    td {
+      padding: 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+
+    tbody tr:hover {
+      background: rgba(245,166,35,0.05);
+    }
+
+    /* ── BADGES ── */
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .badge-active {
+      background: rgba(76,209,119,0.2);
+      color: var(--success);
+    }
+
+    .badge-inactive {
+      background: rgba(107,107,107,0.2);
+      color: var(--text-dim);
+    }
+
+    .badge-basic {
+      background: rgba(100,150,200,0.2);
+      color: #6496c8;
+    }
+
+    .badge-pro {
+      background: rgba(245,166,35,0.2);
+      color: var(--accent);
+    }
+
+    .badge-enterprise {
+      background: rgba(76,209,119,0.2);
+      color: var(--success);
+    }
+
+    /* ── PAGINATION ── */
+    .pagination-info {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 16px;
+    }
+
+    .pagination-controls {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .pagination-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .pagination-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .pagination-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--bg-dark);
+    }
+
+    @media (max-width: 768px) {
+      .sidebar { width: 70px; }
+      .main-content { margin-left: 70px; padding: 20px; }
+      .search-bar { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="dashboard-wrapper">
+
+    <!-- ═══════════════════════════ SIDEBAR ═══════════════════════════ -->
+    <aside class="sidebar">
+
+      <div class="sidebar-header">
+        <div class="sidebar-brand">OrgMember</div>
+        <div class="sidebar-subtitle">Super Admin</div>
+      </div>
+
+      <ul class="sidebar-menu">
+        <li class="menu-item">
+          <div class="menu-link active" onclick="switchTab('overview', this)">
+            <i class="bi bi-graph-up menu-icon"></i>
+            <span>Dashboard</span>
+          </div>
+        </li>
+        <li class="menu-item">
+          <div class="menu-link" onclick="switchTab('organizations', this)">
+            <i class="bi bi-building menu-icon"></i>
+            <span>Organizations</span>
+          </div>
+        </li>
+        <li class="menu-item">
+          <div class="menu-link" onclick="switchTab('admins', this)">
+            <i class="bi bi-shield-lock menu-icon"></i>
+            <span>Admins</span>
+          </div>
+        </li>
+        <li class="menu-item">
+          <div class="menu-link" onclick="switchTab('members', this)">
+            <i class="bi bi-people-fill menu-icon"></i>
+            <span>Members</span>
+          </div>
+        </li>
+        <li class="menu-item">
+          <div class="menu-link" onclick="switchTab('payments', this)">
+            <i class="bi bi-credit-card menu-icon"></i>
+            <span>Payments</span>
+          </div>
+        </li>
+        <li class="menu-item">
+          <div class="menu-link" onclick="switchTab('reports', this)">
+            <i class="bi bi-bar-chart menu-icon"></i>
+            <span>Reports</span>
+          </div>
+        </li>
+        <li class="menu-item">
+          <div class="menu-link" onclick="switchTab('settings', this)">
+            <i class="bi bi-gear menu-icon"></i>
+            <span>Settings</span>
+          </div>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="user-profile">
+          <div class="user-avatar-sm">SA</div>
+          <div class="user-profile-info">
+            <div class="user-profile-name">Super Admin</div>
+            <div class="user-profile-role">Platform Owner</div>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- ═══════════════════════════ MAIN CONTENT ═══════════════════════════ -->
+    <main class="main-content">
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1 class="page-title">Super Admin Dashboard</h1>
+        <div class="header-right">
+          <div class="notification-badge" data-count="5"><i class="bi bi-bell"></i></div>
+          <div class="user-dropdown-wrapper">
+            <button class="user-profile-dropdown" onclick="toggleUserDropdown()">
+              Super Admin <i class="bi bi-chevron-down"></i>
+            </button>
+            <div class="user-dropdown-menu" id="userDropdown">
+              <div class="dropdown-item dropdown-header">Super Admin</div>
+              <a href="#" class="dropdown-item" onclick="return false;">
+                <i class="bi bi-person me-2"></i>Profile
+              </a>
+              <a href="#" class="dropdown-item" onclick="handleLogout(); return false;">
+                <i class="bi bi-box-arrow-right me-2"></i>Log Out
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════ OVERVIEW TAB ═══════════════════════════ -->
+      <div id="overview-tab" class="tab-content active">
+
+        <!-- Stat Cards -->
+        <div class="stat-cards-grid">
+          <div class="stat-card">
+            <div class="stat-label">Total Organizations</div>
+            <div class="stat-value" id="stat-orgs">-</div>
+            <div class="stat-sub">Registered platform-wide</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Active Users</div>
+            <div class="stat-value" id="stat-active-users">-</div>
+            <div class="stat-sub">Active Admins & Members</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total Members</div>
+            <div class="stat-value" id="stat-total-members">-</div>
+            <div class="stat-sub">Platform-wide members</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total Revenue</div>
+            <div class="stat-value" id="stat-revenue">-</div>
+            <div class="stat-sub">All-time revenue</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Monthly Earnings</div>
+            <div class="stat-value" id="stat-monthly-revenue">-</div>
+            <div class="stat-sub">This month's collected payments</div>
+          </div>
+        </div>
+
+        <!-- System Health & Recent Activity -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+
+          <!-- System Health -->
+          <div class="section-box">
+            <h3 class="section-title">System Health</h3>
+            <div style="margin-top: 16px;">
+              <div style="margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                  <span style="font-size: 0.85rem; color: var(--text-muted);">Server Uptime</span>
+                  <span id="health-uptime-val" style="font-weight: 600;">-</span>
+                </div>
+                <div style="width: 100%; height: 6px; background: var(--bg-dark); border-radius: 3px; overflow: hidden;">
+                  <div id="health-uptime-bar" style="width: 100%; height: 100%; background: var(--success);"></div>
+                </div>
+              </div>
+              <div style="margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                  <span style="font-size: 0.85rem; color: var(--text-muted);">System RAM Usage</span>
+                  <span id="health-ram-val" style="font-weight: 600;">-</span>
+                </div>
+                <div style="width: 100%; height: 6px; background: var(--bg-dark); border-radius: 3px; overflow: hidden;">
+                  <div id="health-ram-bar" style="width: 0%; height: 100%; background: var(--accent);"></div>
+                </div>
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                  <span style="font-size: 0.85rem; color: var(--text-muted);">Database Link Status</span>
+                  <span id="health-db-val" style="font-weight: 600;">Online</span>
+                </div>
+                <div style="width: 100%; height: 6px; background: var(--bg-dark); border-radius: 3px; overflow: hidden;">
+                  <div style="width: 100%; height: 100%; background: var(--success);"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Activity -->
+          <div class="section-box">
+            <h3 class="section-title">Recent Activity</h3>
+            <div id="recent-activities-container" style="margin-top: 16px;">
+              <!-- Dynamic Activity Content -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ═══════════════════════════ ORGANIZATIONS TAB ═══════════════════════════ -->
+      <div id="organizations-tab" class="tab-content">
+        <div class="section-box">
+          <div class="section-header">
+            <h3 class="section-title">Organization Management</h3>
+            <button class="btn-primary" data-bs-toggle="modal" data-bs-target="#createOrgModal"><i class="bi bi-plus me-2"></i>Create Organization</button>
+          </div>
+
+          <div class="controls-row">
+            <input type="text" class="search-bar" id="orgs-search" placeholder="Search organizations..." oninput="handleOrgSearch()">
+            <button class="btn-secondary" style="margin-left: auto;" onclick="exportOrgs()"><i class="bi bi-download me-2"></i>Export</button>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Organization Name</th>
+                  <th>Admin</th>
+                  <th>Members</th>
+                  <th>Plan</th>
+                  <th>Status</th>
+                  <th>Revenue Limit</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="orgs-table-body">
+                <!-- Dynamic Content -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pagination-info">Showing 1 to 3 of 1,250 organizations</div>
+          <div class="pagination-controls">
+            <button class="pagination-btn"><i class="bi bi-chevron-left"></i></button>
+            <button class="pagination-btn active">1</button>
+            <button class="pagination-btn">2</button>
+            <button class="pagination-btn">3</button>
+            <button class="pagination-btn">...</button>
+            <button class="pagination-btn"><i class="bi bi-chevron-right"></i></button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ═══════════════════════════ ADMINS TAB ═══════════════════════════ -->
+      <div id="admins-tab" class="tab-content">
+
+        <div class="section-box">
+          <div class="section-header">
+            <h3 class="section-title">Admin Management</h3>
+            <button class="btn-primary"><i class="bi bi-plus me-2"></i>Create Admin</button>
+          </div>
+
+          <div class="controls-row">
+            <input type="text" class="search-bar" id="admins-search" placeholder="Search admins..." oninput="handleAdminsSearch()">
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Admin Name</th>
+                  <th>Email</th>
+                  <th>Organization</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                </tr>
+              </thead>
+              <tbody id="admins-table-body">
+                <!-- Dynamic Content -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ═══════════════════════════ MEMBERS TAB ═══════════════════════════ -->
+
+      <div id="members-tab" class="tab-content">
+
+        <div class="section-box">
+          <div class="section-header">
+            <h3 class="section-title">All Members (System-Wide)</h3>
+          </div>
+
+          <div class="controls-row">
+            <input type="text" class="search-bar" id="members-search" placeholder="Search members..." oninput="handleMembersSearch()">
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Member Name</th>
+                  <th>Organization</th>
+                  <th>Email</th>
+                  <th>Status</th>
+                  <th>Joined</th>
+                </tr>
+              </thead>
+              <tbody id="members-table-body">
+                <!-- Dynamic Content -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ═══════════════════════════ PAYMENTS TAB ═══════════════════════════ -->
+      <div id="payments-tab" class="tab-content">
+
+        <div class="section-box">
+          <div class="section-header">
+            <h3 class="section-title">Payment Management</h3>
+          </div>
+
+          <div class="controls-row">
+            <input type="text" class="search-bar" id="payments-search" placeholder="Search payments..." oninput="handlePaymentsSearch()">
+            <button class="btn-secondary" style="margin-left: auto;" onclick="exportPayments()"><i class="bi bi-download me-2"></i>Export</button>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Organization</th>
+                  <th>Amount</th>
+                  <th>User</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="payments-table-body">
+                <!-- Dynamic Content -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ═══════════════════════════ REPORTS TAB ═══════════════════════════ -->
+      <div id="reports-tab" class="tab-content">
+
+        <div class="stat-cards-grid">
+          <div class="stat-card">
+            <div class="stat-label">Organization Growth</div>
+            <div class="stat-value">+6.8%</div>
+            <div class="stat-sub">Last 30 days</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Member Growth</div>
+            <div class="stat-value">+14.2%</div>
+            <div class="stat-sub">Last 30 days</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Revenue Growth</div>
+            <div class="stat-value">+22.5%</div>
+            <div class="stat-sub">Last 30 days</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Active Orgs</div>
+            <div class="stat-value">1,158</div>
+            <div class="stat-sub">92.6% active rate</div>
+          </div>
+        </div>
+
+        <div class="section-box">
+          <h3 class="section-title">System Reports</h3>
+          <p style="color: var(--text-muted); margin-top: 20px; text-align: center;">Detailed analytics and reports coming soon...</p>
+        </div>
+
+      </div>
+
+      <!-- ═══════════════════════════ SETTINGS TAB ═══════════════════════════ -->
+      <div id="settings-tab" class="tab-content">
+
+        <div class="section-box">
+          <h3 class="section-title">System Settings</h3>
+          <div style="margin-top: 20px;">
+            <div style="margin-bottom: 20px;">
+              <label style="font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 8px;">System Name</label>
+              <input type="text" style="width: 100%; max-width: 400px; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text-white); padding: 10px; border-radius: var(--radius); font-family: 'Inter', sans-serif;" value="OrgMember Platform" />
+            </div>
+            <div style="margin-bottom: 20px;">
+              <label style="font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 8px;">Default Currency</label>
+              <select style="width: 100%; max-width: 400px; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text-white); padding: 10px; border-radius: var(--radius); font-family: 'Inter', sans-serif;">
+                <option>USD</option>
+                <option>EUR</option>
+                <option>GBP</option>
+              </select>
+            </div>
+            <button class="btn-primary">Save Settings</button>
+          </div>
+        </div>
+
+        <div class="section-box">
+          <div class="section-header">
+            <h3 class="section-title">System Logs</h3>
+            <button class="btn-secondary" onclick="downloadLogs()"><i class="bi bi-download me-2"></i>Download Logs</button>
+          </div>
+          <div style="margin-top: 20px;">
+            <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 16px;">
+              <select id="logsFilterType" style="background: var(--bg-dark); border: 1px solid var(--border); color: var(--text-white); padding: 10px; border-radius: var(--radius); font-family: 'Inter', sans-serif; min-width: 180px;">
+                <option value="">All types</option>
+                <option value="info">Info</option>
+                <option value="warning">Warning</option>
+                <option value="error">Error</option>
+              </select>
+              <input id="logsFilterDate" type="date" style="background: var(--bg-dark); border: 1px solid var(--border); color: var(--text-white); padding: 10px; border-radius: var(--radius); font-family: 'Inter', sans-serif;" />
+              <button class="btn-primary" onclick="filterLogs()">Filter</button>
+            </div>
+            <div id="systemLogsContainer" style="background: var(--bg-dark); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; min-height: 160px; color: var(--text-muted);">
+              <p>No logs available in this deployment.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-box">
+          <div class="section-header">
+            <h3 class="section-title">Database Backup</h3>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <button class="btn-primary" onclick="backupDatabase()">Backup Now</button>
+              <button class="btn-secondary" onclick="restoreDatabase()">Restore Backup</button>
+            </div>
+          </div>
+          <p style="color: var(--text-muted); margin-top: 14px;">Backup and restore actions are currently handled by the backend console.</p>
+        </div>
+
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- ═══════════════════════════ MODALS ═══════════════════════════ -->
+  <!-- Create Org Modal -->
+  <div class="modal fade" id="createOrgModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content" style="background: var(--bg-card); border: 1px solid var(--border); color: var(--text-white);">
+        <div class="modal-header" style="border-bottom: 1px solid var(--border);">
+          <h5 class="modal-title font-family-serif">Create New Organization</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="createOrgForm" onsubmit="submitCreateOrg(event)">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label text-muted">Organization Name</label>
+              <input type="text" class="form-control" id="new-org-name" style="background: var(--bg-dark); border: 1px solid var(--border); color: var(--text-white);" required>
+            </div>
+            <div class="row">
+              <div class="col mb-3">
+                <label class="form-label text-muted">Org Type</label>
+                <select class="form-select" id="new-org-type" style="background: var(--bg-dark); border: 1px solid var(--border); color: var(--text-white);" required>
+                  <option value="corporate">Corporate</option>
+                  <option value="non-profit">Non-Profit</option>
+                  <option value="government">Government</option>
+                  <option value="startup">Startup</option>
+                  <option value="educational">Educational</option>
+                </select>
+              </div>
+              <div class="col mb-3">
+                <label class="form-label text-muted">Plan</label>
+                <select class="form-select" id="new-org-plan" style="background: var(--bg-dark); border: 1px solid var(--border); color: var(--text-white);" required>
+                  <option value="Basic">Basic</option>
+                  <option value="Pro">Pro</option>
+                  <option value="Enterprise">Enterprise</option>
+                 </select>
+               </div>
+             </div>
+             <div class="mb-3">
+               <label class="form-label text-muted">Members Limit</label>
+               <input type="number" class="form-control" id="new-org-limit" value="5" style="background: var(--bg-dark); border: 1px solid var(--border); color: var(--text-white);" required>
+             </div>
+             <hr style="border-top: 1px solid var(--border);">
+             <h6 style="color: var(--accent);">Admin User Details</h6>
+             <div class="mb-3">
+               <label class="form-label text-muted">Admin Full Name</label>
+               <input type="text" class="form-control" id="new-org-admin-name" style="background: var(--bg-dark); border: 1px solid var(--border); color: var(--text-white);" required>
+             </div>
+             <div class="mb-3">
+               <label class="form-label text-muted">Admin Email</label>
+               <input type="email" class="form-control" id="new-org-admin-email" style="background: var(--bg-dark); border: 1px solid var(--border); color: var(--text-white);" required>
+             </div>
+             <div class="mb-3">
+               <label class="form-label text-muted">Admin Password</label>
+               <input type="password" class="form-control" id="new-org-admin-password" style="background: var(--bg-dark); border: 1px solid var(--border); color: var(--text-white);" required>
+             </div>
+           </div>
+           <div class="modal-footer" style="border-top: 1px solid var(--border);">
+             <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+             <button type="submit" class="btn btn-primary btn-sm" style="background: var(--accent); color: var(--bg-dark); border: none;">Create</button>
+           </div>
+         </form>
+       </div>
+     </div>
+   </div>
+
+   <!-- Edit Org Modal -->
+   <div class="modal fade" id="editOrgModal" tabindex="-1" aria-hidden="true">
+     <div class="modal-dialog">
+       <div class="modal-content" style="background: var(--bg-card); border: 1px solid var(--border); color: var(--text-white);">
+         <div class="modal-header" style="border-bottom: 1px solid var(--border);">
+           <h5 class="modal-title font-family-serif">Edit Organization</h5>
+           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+         </div>
+         <form id="editOrgForm" onsubmit="submitEditOrg(event)">
+           <input type="hidden" id="edit-org-id">
+           <div class="modal-body">
+             <div class="mb-3">
+               <label class="form-label text-muted">Organization Name</label>
+               <input type="text" class="form-control" id="edit-org-name" style="background: var(--bg-dark); border: 1px solid var(--border); color: var(--text-white);" required>
+             </div>
+             <div class="row">
+               <div class="col mb-3">
+                 <label class="form-label text-muted">Org Type</label>
+                 <select class="form-select" id="edit-org-type" style="background: var(--bg-dark); border: 1px solid var(--border); color: var(--text-white);" required>
+                   <option value="corporate">Corporate</option>
+                   <option value="non-profit">Non-Profit</option>
+                   <option value="government">Government</option>
+                   <option value="startup">Startup</option>
+                   <option value="educational">Educational</option>
+                 </select>
+               </div>
+               <div class="col mb-3">
+                 <label class="form-label text-muted">Plan</label>
+                 <select class="form-select" id="edit-org-plan" style="background: var(--bg-dark); border: 1px solid var(--border); color: var(--text-white);" required>
+                   <option value="Basic">Basic</option>
+                   <option value="Pro">Pro</option>
+                   <option value="Enterprise">Enterprise</option>
+                 </select>
+               </div>
+             </div>
+             <div class="mb-3">
+               <label class="form-label text-muted">Members Limit</label>
+               <input type="number" class="form-control" id="edit-org-limit" style="background: var(--bg-dark); border: 1px solid var(--border); color: var(--text-white);" required>
+             </div>
+             <div class="mb-3">
+               <label class="form-label text-muted">Status</label>
+               <select class="form-select" id="edit-org-status" style="background: var(--bg-dark); border: 1px solid var(--border); color: var(--text-white);" required>
+                 <option value="active">Active</option>
+                 <option value="inactive">Inactive</option>
+               </select>
+             </div>
+           </div>
+           <div class="modal-footer" style="border-top: 1px solid var(--border);">
+             <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+             <button type="submit" class="btn btn-primary btn-sm" style="background: var(--accent); color: var(--bg-dark); border: none;">Save Changes</button>
+           </div>
+         </form>
+       </div>
+     </div>
+   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="theme-toggle.js"></script>
+
+  <script>
+    let allOrganizations = [];
+    let allAdmins = [];
+    let allMembers = [];
+    let allPayments = [];
+    let currentUser = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAuth();
+    });
+
+    function checkAuth() {
+      fetch('http://localhost:3000/api/auth/me', { credentials: 'include' })
+        .then(res => {
+          if (res.status === 401) {
+            window.location.href = 'login.html';
+            return;
+          }
+          return res.json();
+        })
+        .then(data => {
+          if (data && data.success) {
+            if (data.user.role !== 'superadmin') {
+              window.location.href = 'login.html';
+              return;
+            }
+            currentUser = data.user;
+            document.querySelector('.user-profile-name').textContent = currentUser.full_name;
+            document.querySelector('.user-profile-dropdown').innerHTML = `${currentUser.full_name} <i class="bi bi-chevron-down"></i>`;
+            
+            // Fill initial stats
+            loadStats();
+          }
+        })
+        .catch(err => {
+          console.error('Auth check failed:', err);
+          window.location.href = 'login.html';
+        });
+    }
+
+    // Tab switching
+    function switchTab(tabName, clickedLink) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.menu-link').forEach(link => link.classList.remove('active'));
+      
+      document.getElementById(tabName + '-tab').classList.add('active');
+      if (clickedLink) {
+        clickedLink.classList.add('active');
+      }
+
+      if (tabName === 'overview') {
+        loadStats();
+      } else if (tabName === 'organizations') {
+        loadOrganizations();
+      } else if (tabName === 'admins') {
+        loadAdmins();
+      } else if (tabName === 'members') {
+        loadMembers();
+      } else if (tabName === 'payments') {
+        loadPayments();
+      }
+    }
+
+    function loadStats() {
+      fetch('http://localhost:3000/api/superadmin/stats', { credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            const { stats } = data;
+            document.getElementById('stat-orgs').textContent = stats.total_orgs;
+            document.getElementById('stat-active-users').textContent = stats.active_users;
+            document.getElementById('stat-total-members').textContent = stats.total_members;
+            document.getElementById('stat-revenue').textContent = `$${Number(stats.total_revenue).toLocaleString()}`;
+            document.getElementById('stat-monthly-revenue').textContent = `$${Number(stats.monthly_revenue).toLocaleString()}`;
+            
+            const uptimeHours = (stats.uptime / 3600).toFixed(2);
+            document.getElementById('health-uptime-val').textContent = `${uptimeHours} Hours`;
+            document.getElementById('health-ram-val').textContent = `${stats.ram_usage}%`;
+            document.getElementById('health-ram-bar').style.width = `${stats.ram_usage}%`;
+
+            const container = document.getElementById('recent-activities-container');
+            container.innerHTML = '';
+            if (stats.activities.length === 0) {
+              container.innerHTML = '<p class="text-center text-muted" style="font-size:0.85rem; padding:15px 0;">No recent activities</p>';
+            } else {
+              stats.activities.forEach(act => {
+                let statusColorClass = 'text-white';
+                if (act.type === 'payment') statusColorClass = 'var(--success)';
+                if (act.type === 'user' && act.text.includes('suspended')) statusColorClass = 'var(--warning)';
+                
+                const timeAgo = formatTimeAgo(new Date(act.time));
+                const div = document.createElement('div');
+                div.style.padding = '12px 0';
+                div.style.borderBottom = '1px solid var(--border)';
+                div.style.fontSize = '0.9rem';
+                div.innerHTML = `
+                  <span style="color: var(--text-muted);">${act.type.toUpperCase()}:</span>
+                  <span style="color: ${statusColorClass}; font-weight: 600; margin-left: 8px;">${act.text}</span>
+                  <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 4px;">${timeAgo}</div>
+                `;
+                container.appendChild(div);
+              });
+            }
+          }
+        })
+        .catch(err => console.error('Failed to load stats:', err));
+    }
+
+    function formatTimeAgo(date) {
+      const seconds = Math.floor((new Date() - date) / 1000);
+      let interval = Math.floor(seconds / 31536000);
+      if (interval >= 1) return interval + " years ago";
+      interval = Math.floor(seconds / 2592000);
+      if (interval >= 1) return interval + " months ago";
+      interval = Math.floor(seconds / 86400);
+      if (interval >= 1) return interval + " days ago";
+      interval = Math.floor(seconds / 3600);
+      if (interval >= 1) return interval + " hours ago";
+      interval = Math.floor(seconds / 60);
+      if (interval >= 1) return interval + " minutes ago";
+      return seconds < 10 ? "just now" : Math.floor(seconds) + " seconds ago";
+    }
+
+    function loadOrganizations() {
+      fetch('http://localhost:3000/api/organizations', { credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            allOrganizations = data.organizations;
+            displayOrgs(allOrganizations);
+          }
+        })
+        .catch(err => console.error('Failed to load organizations:', err));
+    }
+
+    function displayOrgs(orgs) {
+      const tbody = document.getElementById('orgs-table-body');
+      tbody.innerHTML = '';
+      if (orgs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No organizations found</td></tr>';
+        return;
+      }
+      orgs.forEach(org => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-weight: 600;">${org.name}</td>
+          <td>${org.admin_name || 'N/A'}</td>
+          <td>${org.member_count} / ${org.members_limit}</td>
+          <td><span class="badge badge-${org.plan.toLowerCase()}">${org.plan}</span></td>
+          <td><span class="badge badge-${org.status === 'active' ? 'active' : 'inactive'}">${org.status}</span></td>
+          <td>${org.plan === 'Basic' ? '$0/mo' : org.plan === 'Pro' ? '$29/mo' : '$199/mo'}</td>
+          <td>
+            <button class="btn btn-sm btn-outline-warning me-1" onclick="openEditOrg(${org.id})"><i class="bi bi-pencil-fill"></i></button>
+            <button class="btn btn-sm btn-outline-danger" onclick="deleteOrg(${org.id})"><i class="bi bi-trash-fill"></i></button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function submitCreateOrg(e) {
+      e.preventDefault();
+      const name = document.getElementById('new-org-name').value.trim();
+      const org_type = document.getElementById('new-org-type').value;
+      const plan = document.getElementById('new-org-plan').value;
+      const members_limit = document.getElementById('new-org-limit').value;
+      const admin_name = document.getElementById('new-org-admin-name').value.trim();
+      const admin_email = document.getElementById('new-org-admin-email').value.trim();
+      const admin_password = document.getElementById('new-org-admin-password').value;
+
+      fetch('http://localhost:3000/api/organizations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ name, org_type, plan, members_limit, admin_name, admin_email, admin_password })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert(data.message);
+          const modal = bootstrap.Modal.getInstance(document.getElementById('createOrgModal'));
+          modal.hide();
+          document.getElementById('createOrgForm').reset();
+          loadOrganizations();
+        } else {
+          alert(data.message);
+        }
+      })
+      .catch(err => {
+        console.error('Error creating org:', err);
+        alert('Failed to connect to server');
+      });
+    }
+
+    function openEditOrg(id) {
+      const org = allOrganizations.find(o => o.id === id);
+      if (!org) return;
+
+      document.getElementById('edit-org-id').value = org.id;
+      document.getElementById('edit-org-name').value = org.name;
+      document.getElementById('edit-org-type').value = org.org_type;
+      document.getElementById('edit-org-plan').value = org.plan;
+      document.getElementById('edit-org-limit').value = org.members_limit;
+      document.getElementById('edit-org-status').value = org.status;
+
+      const modal = new bootstrap.Modal(document.getElementById('editOrgModal'));
+      modal.show();
+    }
+
+    function submitEditOrg(e) {
+      e.preventDefault();
+      const id = document.getElementById('edit-org-id').value;
+      const name = document.getElementById('edit-org-name').value.trim();
+      const org_type = document.getElementById('edit-org-type').value;
+      const plan = document.getElementById('edit-org-plan').value;
+      const members_limit = document.getElementById('edit-org-limit').value;
+      const status = document.getElementById('edit-org-status').value;
+
+      fetch(`http://localhost:3000/api/organizations/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ name, org_type, plan, members_limit, status })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert(data.message);
+          const modal = bootstrap.Modal.getInstance(document.getElementById('editOrgModal'));
+          modal.hide();
+          loadOrganizations();
+        } else {
+          alert(data.message);
+        }
+      })
+      .catch(err => console.error('Error updating org:', err));
+    }
+
+    function deleteOrg(id) {
+      if (!confirm('Are you sure you want to delete this organization? All members, events, and records will be deleted.')) {
+        return;
+      }
+      fetch(`http://localhost:3000/api/organizations/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert(data.message);
+          loadOrganizations();
+        } else {
+          alert(data.message);
+        }
+      })
+      .catch(err => console.error('Error deleting org:', err));
+    }
+
+    function loadAdmins() {
+      fetch('http://localhost:3000/api/superadmin/admins', { credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            allAdmins = data.admins;
+            displayAdmins(allAdmins);
+          }
+        })
+        .catch(err => console.error('Failed to load admins:', err));
+    }
+
+    function displayAdmins(admins) {
+      const tbody = document.getElementById('admins-table-body');
+      tbody.innerHTML = '';
+      if (admins.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No admins found</td></tr>';
+        return;
+      }
+      admins.forEach(admin => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-weight: 600;">${admin.full_name}</td>
+          <td>${admin.email}</td>
+          <td>${admin.org_name || 'No Org (Platform Admin)'}</td>
+          <td><span class="badge badge-${admin.status === 'active' ? 'active' : 'inactive'}">${admin.status}</span></td>
+          <td>${new Date(admin.created_at).toLocaleDateString()}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function loadMembers() {
+      fetch('http://localhost:3000/api/superadmin/members', { credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            allMembers = data.members;
+            displayMembers(allMembers);
+          }
+        })
+        .catch(err => console.error('Failed to load members:', err));
+    }
+
+    function displayMembers(members) {
+      const tbody = document.getElementById('members-table-body');
+      tbody.innerHTML = '';
+      if (members.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No members found</td></tr>';
+        return;
+      }
+      members.forEach(member => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-weight: 600;">${member.full_name}</td>
+          <td>${member.org_name || 'N/A'}</td>
+          <td>${member.email}</td>
+          <td><span class="badge badge-${member.status === 'active' ? 'active' : 'inactive'}">${member.status}</span></td>
+          <td>${new Date(member.created_at).toLocaleDateString()}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function loadPayments() {
+      fetch('http://localhost:3000/api/superadmin/payments', { credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            allPayments = data.payments;
+            displayPayments(allPayments);
+          }
+        })
+        .catch(err => console.error('Failed to load payments:', err));
+    }
+
+    function displayPayments(payments) {
+      const tbody = document.getElementById('payments-table-body');
+      tbody.innerHTML = '';
+      if (payments.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No payments found</td></tr>';
+        return;
+      }
+      payments.forEach(payment => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-weight: 600;">${payment.org_name || 'N/A'}</td>
+          <td>${payment.currency} ${Number(payment.amount).toFixed(2)}</td>
+          <td>${payment.user_name || 'N/A'}</td>
+          <td>${new Date(payment.created_at).toLocaleDateString()}</td>
+          <td><span class="badge badge-${payment.status === 'paid' ? 'active' : 'inactive'}">${payment.status}</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function handleOrgSearch() {
+      const query = document.getElementById('orgs-search').value.toLowerCase().trim();
+      const filtered = allOrganizations.filter(o => 
+        o.name.toLowerCase().includes(query) || 
+        (o.admin_name && o.admin_name.toLowerCase().includes(query))
+      );
+      displayOrgs(filtered);
+    }
+
+    function handleAdminsSearch() {
+      const query = document.getElementById('admins-search').value.toLowerCase().trim();
+      const filtered = allAdmins.filter(a => 
+        a.full_name.toLowerCase().includes(query) || 
+        a.email.toLowerCase().includes(query) ||
+        (a.org_name && a.org_name.toLowerCase().includes(query))
+      );
+      displayAdmins(filtered);
+    }
+
+    function handleMembersSearch() {
+      const query = document.getElementById('members-search').value.toLowerCase().trim();
+      const filtered = allMembers.filter(m => 
+        m.full_name.toLowerCase().includes(query) || 
+        m.email.toLowerCase().includes(query) ||
+        (m.org_name && m.org_name.toLowerCase().includes(query))
+      );
+      displayMembers(filtered);
+    }
+
+    function handlePaymentsSearch() {
+      const query = document.getElementById('payments-search').value.toLowerCase().trim();
+      const filtered = allPayments.filter(p => 
+        (p.org_name && p.org_name.toLowerCase().includes(query)) ||
+        (p.user_name && p.user_name.toLowerCase().includes(query)) ||
+        p.amount.toString().includes(query)
+      );
+      displayPayments(filtered);
+    }
+
+    function exportOrgs() {
+      let csv = 'Org Name,Admin Name,Members Count,Plan,Status,Members Limit\n';
+      allOrganizations.forEach(o => {
+        csv += `"${o.name}","${o.admin_name || ''}","${o.member_count}","${o.plan}","${o.status}","${o.members_limit}"\n`;
+      });
+      downloadCSV('organizations.csv', csv);
+    }
+
+    function exportPayments() {
+      let csv = 'Organization,Amount,User,Date,Status\n';
+      allPayments.forEach(p => {
+        csv += `"${p.org_name || ''}","${p.currency} ${p.amount}","${p.user_name || ''}","${new Date(p.created_at).toLocaleDateString()}","${p.status}"\n`;
+      });
+      downloadCSV('payments.csv', csv);
+    }
+
+    function downloadCSV(filename, text) {
+      const element = document.createElement('a');
+      element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(text));
+      element.setAttribute('download', filename);
+      element.style.display = 'none';
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+    }
+
+    // User dropdown
+    function toggleUserDropdown() {
+      document.getElementById('userDropdown').classList.toggle('show');
+    }
+
+    document.addEventListener('click', function(event) {
+      const dropdown = document.getElementById('userDropdown');
+      const wrapper = document.querySelector('.user-dropdown-wrapper');
+      if (dropdown && wrapper && !wrapper.contains(event.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+
+    function handleLogout() {
+      fetch('http://localhost:3000/api/auth/logout', { method: 'POST', credentials: 'include' })
+        .then(() => {
+          window.location.href = 'login.html';
+        })
+        .catch(() => {
+          window.location.href = 'login.html';
+        });
+    }
+
+    function downloadLogs() {
+      alert('Log download is not available in this deployment.');
+    }
+
+    function filterLogs() {
+      alert('Log filtering is not available in this deployment.');
+    }
+
+    function backupDatabase() {
+      alert('Database backup is currently available from the backend console.');
+    }
+
+    function restoreDatabase() {
+      alert('Database restore is currently available from the backend console.');
+    }
+  </script>
+
+</body>
+</html>

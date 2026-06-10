@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>OrgMember — Organization Membership Management</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    /* ── CSS Variables (Color System) ── */
+    :root {
+      --bg-dark:      #f8fafc;
+      --bg-card:      #ffffff;
+      --bg-card-2:    #f4f7fb;
+      --accent:       #f5a623;
+      --accent-hover: #e09520;
+      --accent-light: rgba(245,166,35,0.12);
+      --text-white:   #0b1628;
+      --text-muted:   #556c89;
+      --text-dim:     #6b7b8f;
+      --border:       rgba(15,23,42,0.08);
+      --nav-bg:       rgba(255,255,255,0.98);
+      --navbar-toggler-icon-filter: invert(0);
+      --radius:       14px;
+    }
+
+    .theme-feature {
+      --bg-dark:      #0b1628;
+      --bg-card:      #11213a;
+      --bg-card-2:    #162340;
+      --accent:       #f5a623;
+      --accent-hover: #e09520;
+      --accent-light: rgba(245,166,35,0.12);
+      --text-white:   #ffffff;
+      --text-muted:   #8fa8c8;
+      --text-dim:     #5a9a9a;
+      --border:       rgba(255,255,255,0.07);
+      --nav-bg:       rgba(11,22,40,0.95);
+      --navbar-toggler-icon-filter: invert(1);
+    }
+
+    /* ── Base ── */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-white);
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      margin: 0;
+    }
+    h1, h2, h3 { font-family: 'Playfair Display', serif; font-weight: 700; }
+
+    /* ── Navbar ── */
+    .navbar {
+      background-color: var(--nav-bg);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .navbar-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--text-white) !important;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .brand-icon {
+      width: 36px; height: 36px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; color: var(--bg-dark);
+    }
+    .navbar-nav .nav-link {
+      color: var(--text-muted) !important;
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding: 6px 14px !important;
+      transition: color 0.2s;
+    }
+    .navbar-nav .nav-link:hover { color: var(--text-white) !important; }
+    .navbar-toggler { border-color: var(--border); }
+    .navbar-toggler-icon { filter: var(--navbar-toggler-icon-filter); }
+
+    .theme-toggle-btn {
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-white);
+      width: 44px;
+      height: 44px;
+      font-size: 1.1rem;
+      padding: 0;
+      border-radius: 12px;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .theme-toggle-btn:hover {
+      background: rgba(245,166,35,0.08);
+      color: var(--accent);
+    }
+
+    .theme-toggle-btn i {
+      pointer-events: none;
+    }
+
+    .btn-signin {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-white);
+      font-size: 0.87rem;
+      padding: 8px 20px;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .btn-signin:hover { border-color: var(--accent); color: var(--accent); }
+
+    .btn-accent {
+      background: var(--accent);
+      border: none;
+      color: var(--bg-dark);
+      font-size: 0.87rem;
+      padding: 9px 22px;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: background 0.2s, transform 0.1s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-accent:hover { background: var(--accent-hover); transform: translateY(-1px); color: var(--bg-dark); }
+
+    /* ── Hero Section ── */
+    .hero {
+      padding: 100px 0 80px;
+      position: relative;
+      overflow: hidden;
+      min-height: 90vh;
+      display: flex;
+      align-items: center;
+    }
+    .hero-slides {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+    .hero-slide {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 1.2s ease-in-out;
+    }
+    .hero-slide.active { opacity: 1; }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to right,
+        rgba(11,22,40,0.60) 0%,
+        rgba(11,22,40,0.45) 50%,
+        rgba(11,22,40,0.30) 100%
+      );
+      z-index: 1;
+    }
+    .hero .container { position: relative; z-index: 2; }
+    .hero-dots {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      z-index: 3;
+    }
+    .hero-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.3s;
+      padding: 0;
+    }
+    .hero-dot.active {
+      background: var(--accent);
+      transform: scale(1.3);
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent-light);
+      border: 1px solid rgba(245,166,35,0.3);
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 20px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(2.4rem, 5vw, 3.6rem);
+      line-height: 1.15;
+      margin-bottom: 10px;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero-sub {
+      color: var(--text-muted);
+      font-size: 1rem;
+      max-width: 480px;
+      margin-bottom: 36px;
+      line-height: 1.8;
+    }
+    .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 40px; }
+    .btn-outline-hero {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-white);
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      text-decoration: none;
+      display: inline-flex; align-items: center; gap: 8px;
+      transition: all 0.2s;
+    }
+    .btn-outline-hero:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Hero Stats Cards — horizontal strip */
+    .stat-card {
+      background: rgba(17,33,58,0.75);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 20px;
+      transition: border-color 0.25s, transform 0.25s;
+      backdrop-filter: blur(8px);
+    }
+    .stat-card:hover {
+      border-color: rgba(245,166,35,0.4);
+      transform: translateY(-3px);
+    }
+    .stat-icon {
+      width: 44px; height: 44px;
+      background: var(--accent-light);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .stat-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text-white);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .stat-label {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* ── Section Titles ── */
+    .section-label {
+      display: inline-block;
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+      margin-bottom: 16px;
+    }
+    .section-desc {
+      color: var(--text-muted);
+      max-width: 560px;
+      margin: 0 auto 48px;
+      font-size: 0.97rem;
+      line-height: 1.8;
+    }
+
+    .about {
+      padding: 80px 0;
+    }
+    .about-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 32px;
+      align-items: center;
+    }
+    .about-text p { margin-bottom: 18px; }
+    .about-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 24px;
+    }
+    .about-stat {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 20px;
+      text-align: center;
+    }
+    .about-stat strong {
+      display: block;
+      font-size: 1.6rem;
+      font-family: 'Playfair Display', serif;
+      margin-bottom: 8px;
+      color: var(--text-white);
+    }
+    .about-stat span {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .blog {
+      padding: 80px 0;
+    }
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 24px;
+    }
+    .blog-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .blog-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(245,166,35,0.35);
+    }
+    .blog-card h5 {
+      margin: 0 0 12px;
+      font-size: 1.1rem;
+      color: var(--text-white);
+    }
+    .blog-card p {
+      color: var(--text-muted);
+      line-height: 1.8;
+      margin-bottom: 18px;
+      font-size: 0.93rem;
+    }
+    .blog-card small {
+      color: var(--text-dim);
+      font-size: 0.82rem;
+    }
+
+    .contact-section {
+      padding: 80px 0;
+      background: var(--bg-card);
+    }
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 32px;
+      align-items: start;
+    }
+    .contact-card {
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+    }
+    .contact-card h4 {
+      margin-bottom: 18px;
+    }
+    .contact-detail {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 16px;
+      align-items: flex-start;
+    }
+    .contact-detail i {
+      font-size: 1.2rem;
+      color: var(--accent);
+      margin-top: 4px;
+    }
+    .contact-detail p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.75;
+    }
+    .contact-form {
+      display: grid;
+      gap: 16px;
+    }
+    .contact-form input,
+    .contact-form textarea {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--bg-card);
+      color: var(--text-white);
+      font-size: 0.95rem;
+    }
+    .contact-form textarea {
+      min-height: 170px;
+      resize: vertical;
+    }
+    .contact-form button {
+      width: fit-content;
+      padding: 12px 26px;
+      border: none;
+      border-radius: 999px;
+      background: var(--accent);
+      color: var(--bg-dark);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* ── Features Section ── */
+    .features { padding: 80px 0; }
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      height: 100%;
+      transition: border-color 0.25s, transform 0.25s;
+    }
+    .feature-card:hover {
+      border-color: rgba(245,166,35,0.35);
+      transform: translateY(-4px);
+    }
+    .feat-icon {
+      width: 50px; height: 50px;
+      background: var(--accent-light);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      color: var(--accent);
+      margin-bottom: 18px;
+    }
+    .feature-card h5 {
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text-white);
+    }
+    .feature-card p {
+      font-size: 0.87rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    /* ── How it Works ── */
+    .how-it-works { padding: 80px 0; background: var(--bg-card); }
+    .step-card {
+      text-align: center;
+      padding: 20px;
+      position: relative;
+    }
+    .step-num {
+      width: 52px; height: 52px;
+      background: var(--accent);
+      color: var(--bg-dark);
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 800;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 18px;
+    }
+    .step-card h5 {
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 10px;
+    }
+    .step-card p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+    .step-arrow {
+      position: absolute;
+      top: 26px;
+      right: -20px;
+      color: var(--accent);
+      font-size: 1.4rem;
+      opacity: 0.5;
+    }
+
+    /* ── Pricing ── */
+    .pricing { padding: 80px 0; }
+    .pricing-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 36px 28px;
+      height: 100%;
+      position: relative;
+      transition: border-color 0.2s;
+    }
+    .pricing-card.featured {
+      border-color: var(--accent);
+      background: var(--bg-card-2);
+    }
+    .featured-badge {
+      position: absolute;
+      top: -14px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent);
+      color: var(--bg-dark);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 16px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+    .plan-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 12px;
+    }
+    .plan-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.6rem;
+      font-weight: 800;
+      color: var(--text-white);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .plan-price sup { font-size: 1.2rem; vertical-align: top; margin-top: 8px; }
+    .plan-price span { font-size: 0.9rem; font-family: 'Inter', sans-serif; font-weight: 400; color: var(--text-muted); }
+    .plan-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 24px; }
+    .plan-features { list-style: none; padding: 0; margin: 0 0 28px; }
+    .plan-features li {
+      font-size: 0.87rem;
+      color: var(--text-muted);
+      padding: 7px 0;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .plan-features li:last-child { border-bottom: none; }
+    .plan-features li .bi-check-circle-fill { color: var(--accent); }
+    .plan-features li .bi-x-circle-fill { color: var(--text-dim); }
+    .btn-plan {
+      display: block;
+      text-align: center;
+      padding: 11px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-plan-outline {
+      border: 1px solid var(--border);
+      color: var(--text-white);
+    }
+    .btn-plan-outline:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-plan-filled {
+      background: var(--accent);
+      color: var(--bg-dark);
+    }
+    .btn-plan-filled:hover { background: var(--accent-hover); color: var(--bg-dark); }
+
+    /* ── Testimonials ── */
+    .testimonials { padding: 80px 0; background: var(--bg-card); }
+    .testi-card {
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      height: 100%;
+    }
+    .testi-stars { color: var(--accent); font-size: 0.85rem; margin-bottom: 14px; }
+    .testi-text {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+    .testi-author { display: flex; align-items: center; gap: 12px; }
+    .testi-avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--accent-light);
+      border: 2px solid rgba(245,166,35,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--accent);
+    }
+    .testi-name { font-size: 0.9rem; font-weight: 600; color: var(--text-white); }
+    .testi-role { font-size: 0.78rem; color: var(--text-dim); }
+
+    /* ── CTA Section ── */
+    .cta-section {
+      padding: 80px 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px; height: 300px;
+      background: radial-gradient(ellipse, rgba(245,166,35,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cta-section h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); margin-bottom: 16px; }
+    .cta-section p { color: var(--text-muted); max-width: 500px; margin: 0 auto 36px; }
+    .cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      padding: 56px 0 28px;
+    }
+    .footer-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--text-white);
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 14px;
+      text-decoration: none;
+    }
+    .footer-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+      max-width: 280px;
+    }
+    .footer-heading {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-white);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 16px;
+    }
+    .footer-links { list-style: none; padding: 0; margin: 0; }
+    .footer-links li { margin-bottom: 10px; }
+    .footer-links a {
+      font-size: 0.87rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-bottom {
+      margin-top: 48px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer-bottom p { font-size: 0.82rem; color: var(--text-dim); margin: 0; }
+    .social-links { display: flex; gap: 12px; }
+    .social-links a {
+      width: 34px; height: 34px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    .social-links a:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Divider ── */
+    .section-divider { border-color: var(--border); margin: 0; }
+
+    /* ── Scroll Animations ── */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Responsive tweaks ── */
+    @media (max-width: 768px) {
+      .hero { padding: 50px 0 40px; }
+      .stat-grid { grid-template-columns: 1fr 1fr; }
+      .step-arrow { display: none; }
+      .hero-btns { flex-direction: column; align-items: flex-start; }
+      .cta-btns { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════ NAVBAR ══════════════════════════════ -->
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="#">
+        <div class="brand-icon"><i class="bi bi-diagram-3-fill"></i></div>
+        OrgMember
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav mx-auto gap-1">
+          <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="#features">Service</a></li>
+          <li class="nav-item"><a class="nav-link" href="#how-it-works">Event</a></li>
+          <li class="nav-item"><a class="nav-link" href="#blog">Blog</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+        </ul>
+        <div class="d-flex gap-2 mt-3 mt-lg-0">
+          <button type="button" id="themeToggleBtn" class="theme-toggle-btn" aria-label="Toggle theme">
+            <i class="bi bi-moon-stars-fill"></i>
+          </button>
+          <a href="login.html" class="btn-signin">Log In</a>
+          <a href="register.html" class="btn-accent">Get Started</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ══════════════════════════════ HERO ══════════════════════════════ -->
+  <section class="hero">
+
+    <!-- 3 Background Slides — replace URLs with your own images later -->
+    <div class="hero-slides">
+      <div class="hero-slide active" style="background-image: url('assets/hero-bg.jpg');"></div>
+      <div class="hero-slide" style="background-image: url('assets/hero-bg.jpg');"></div>
+      <div class="hero-slide" style="background-image: url('assets/hero-bg.jpg');"></div>
+    </div>
+
+    <!-- Dark overlay so text stays readable -->
+    <div class="hero-overlay"></div>
+
+    <!-- Dot indicators at the bottom -->
+    <div class="hero-dots">
+      <button class="hero-dot active" onclick="goToSlide(0)"></button>
+      <button class="hero-dot" onclick="goToSlide(1)"></button>
+      <button class="hero-dot" onclick="goToSlide(2)"></button>
+    </div>
+
+    <div class="container">
+      <!-- Hero Text — centered -->
+      <div class="row justify-content-center text-center">
+        <div class="col-lg-8">
+          <div class="hero-badge">
+            <i class="bi bi-star-fill"></i>
+            Trusted membership platform
+          </div>
+          <h1>
+            Manage Your<br>
+            Organization.<br>
+            <span>Stay in Control.</span>
+          </h1>
+          <p class="hero-sub mx-auto">
+            OrgMember helps organizations manage members, events, payments,
+            and workflows — all in one powerful platform built for growth.
+          </p>
+          <div class="hero-btns justify-content-center">
+            <a href="register.html" class="btn-accent" style="padding: 12px 28px; font-size: 0.95rem;">
+              <i class="bi bi-rocket-takeoff me-2"></i>Get Started Free
+            </a>
+            <a href="#how-it-works" class="btn-outline-hero">
+              <i class="bi bi-play-circle"></i> See How it Works
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stat Cards — horizontal strip at bottom of hero -->
+      <div class="row g-3 mt-5">
+        <div class="col-6 col-md-3 fade-up">
+          <div class="stat-card text-center">
+            <div class="stat-icon mx-auto"><i class="bi bi-building"></i></div>
+            <div class="stat-number">15,000+</div>
+            <div class="stat-label">Organizations</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 fade-up" style="transition-delay:0.1s">
+          <div class="stat-card text-center">
+            <div class="stat-icon mx-auto"><i class="bi bi-calendar-check-fill"></i></div>
+            <div class="stat-number">750+</div>
+            <div class="stat-label">Events Managed</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 fade-up" style="transition-delay:0.2s">
+          <div class="stat-card text-center">
+            <div class="stat-icon mx-auto"><i class="bi bi-currency-dollar"></i></div>
+            <div class="stat-number">$2M+</div>
+            <div class="stat-label">Million Processed</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3 fade-up" style="transition-delay:0.3s">
+          <div class="stat-card text-center">
+            <div class="stat-icon mx-auto"><i class="bi bi-emoji-smile-fill"></i></div>
+            <div class="stat-number">99%</div>
+            <div class="stat-label">Satisfaction</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════ ABOUT ══════════════════════════════ -->
+  <section class="about" id="about">
+    <div class="container">
+      <div class="text-center">
+        <span class="section-label">About OrgMember</span>
+        <h2 class="section-title">A complete platform built for modern organizations</h2>
+        <p class="section-desc">OrgMember brings together member management, event coordination, payment tracking, and reporting in one polished, easy-to-use system.</p>
+      </div>
+      <div class="about-grid">
+        <div class="about-text">
+          <p>Designed for associations, clubs, and nonprofit organizations, OrgMember helps teams stay organized while reducing manual work. Manage members, approve events, collect payments, and share updates with the right people.</p>
+          <p>Our system is built to scale with you — from a single organization to multiple chapters — with secure role-based access and centralized administration.</p>
+          <div class="about-stats">
+            <div class="about-stat">
+              <strong>100%</strong>
+              <span>Secure access control</span>
+            </div>
+            <div class="about-stat">
+              <strong>24/7</strong>
+              <span>Reliable system support</span>
+            </div>
+            <div class="about-stat">
+              <strong>500+</strong>
+              <span>Organizations onboarded</span>
+            </div>
+          </div>
+        </div>
+        <div class="about-image">
+          <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=900&q=80" alt="About OrgMember" style="width:100%; border-radius:20px; object-fit:cover; height:100%;" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════ FEATURES ══════════════════════════════ -->
+  <section class="features" id="features">
+    <div class="container">
+      <div class="text-center">
+        <span class="section-label">Powerful Features</span>
+        <h2 class="section-title">Everything you need to run<br>your organization</h2>
+        <p class="section-desc">
+          From member management to payment processing — OrgMember gives
+          you the tools to focus on what matters most.
+        </p>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-4 fade-up">
+          <div class="feature-card">
+            <div class="feat-icon"><i class="bi bi-people-fill"></i></div>
+            <h5>Member Management</h5>
+            <p>Add, edit, remove and track members with ease. Assign roles, import in bulk via CSV, and manage member profiles all in one place.</p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4 fade-up" style="transition-delay:0.1s">
+          <div class="feature-card">
+            <div class="feat-icon"><i class="bi bi-calendar-check-fill"></i></div>
+            <h5>Event Coordination</h5>
+            <p>Create and schedule events, set RSVP deadlines, track attendance and send automatic reminders to your members.</p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4 fade-up" style="transition-delay:0.2s">
+          <div class="feature-card">
+            <div class="feat-icon"><i class="bi bi-credit-card-fill"></i></div>
+            <h5>Payment Processing</h5>
+            <p>Track member dues, record manual payments, resend invoices, and monitor payment status — Paid, Due, or Overdue.</p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4 fade-up" style="transition-delay:0.05s">
+          <div class="feature-card">
+            <div class="feat-icon"><i class="bi bi-bar-chart-fill"></i></div>
+            <h5>Advanced Analytics</h5>
+            <p>Get real-time insights into member growth, event participation, and financial performance with exportable reports.</p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4 fade-up" style="transition-delay:0.15s">
+          <div class="feature-card">
+            <div class="feat-icon"><i class="bi bi-shield-lock-fill"></i></div>
+            <h5>Role-Based Access</h5>
+            <p>Super Admin, Organization Admin, and Member — each role sees only what they need. Secure and organized by design.</p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4 fade-up" style="transition-delay:0.25s">
+          <div class="feature-card">
+            <div class="feat-icon"><i class="bi bi-gear-wide-connected"></i></div>
+            <h5>Custom Workflows</h5>
+            <p>Define tasks, set approval processes for events and budgets, assign to members and track progress with deadlines.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════ HOW IT WORKS ══════════════════════════════ -->
+  <section class="how-it-works" id="how-it-works">
+    <div class="container">
+      <div class="text-center">
+        <span class="section-label">Simple Implementation</span>
+        <h2 class="section-title">Up and running in minutes</h2>
+        <p class="section-desc">Getting your organization on OrgMember is fast and straightforward. No technical experience required.</p>
+      </div>
+      <div class="row g-4 justify-content-center">
+        <div class="col-6 col-md-3">
+          <div class="step-card fade-up">
+            <div class="step-num">1</div>
+            <h5>Sign Up</h5>
+            <p>Create your organization account in under 2 minutes. No credit card needed to start.</p>
+            <span class="step-arrow d-none d-md-block"><i class="bi bi-arrow-right"></i></span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="step-card fade-up" style="transition-delay:0.1s">
+            <div class="step-num">2</div>
+            <h5>Import Members</h5>
+            <p>Upload your member list via CSV or add them manually one by one.</p>
+            <span class="step-arrow d-none d-md-block"><i class="bi bi-arrow-right"></i></span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="step-card fade-up" style="transition-delay:0.2s">
+            <div class="step-num">3</div>
+            <h5>Configure Settings</h5>
+            <p>Set your subscription plans, roles, and notification preferences.</p>
+            <span class="step-arrow d-none d-md-block"><i class="bi bi-arrow-right"></i></span>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="step-card fade-up" style="transition-delay:0.3s">
+            <div class="step-num">4</div>
+            <h5>Go Live</h5>
+            <p>Start managing events, payments, and members from your dashboard today.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════ PRICING ══════════════════════════════ -->
+  <section class="pricing" id="pricing">
+    <div class="container">
+      <div class="text-center">
+        <span class="section-label">Flexible Pricing</span>
+        <h2 class="section-title">Choose the right plan</h2>
+        <p class="section-desc">Start for free and upgrade as your organization grows. No hidden fees.</p>
+      </div>
+      <div class="row g-4 justify-content-center">
+
+        <!-- Starter -->
+        <div class="col-md-6 col-lg-4 fade-up">
+          <div class="pricing-card">
+            <p class="plan-name">Starter</p>
+            <div class="plan-price"><sup>$</sup>0<span>/mo</span></div>
+            <p class="plan-desc">Perfect for small organizations just getting started.</p>
+            <ul class="plan-features">
+              <li><i class="bi bi-check-circle-fill"></i> Up to 50 members</li>
+              <li><i class="bi bi-check-circle-fill"></i> 3 events per month</li>
+              <li><i class="bi bi-check-circle-fill"></i> Basic reporting</li>
+              <li><i class="bi bi-x-circle-fill"></i> Payment processing</li>
+              <li><i class="bi bi-x-circle-fill"></i> Custom workflows</li>
+              <li><i class="bi bi-x-circle-fill"></i> Priority support</li>
+            </ul>
+            <a href="register.html" class="btn-plan btn-plan-outline">Get Started Free</a>
+          </div>
+        </div>
+
+        <!-- Professional (Featured) -->
+        <div class="col-md-6 col-lg-4 fade-up" style="transition-delay:0.1s">
+          <div class="pricing-card featured">
+            <div class="featured-badge">Most Popular</div>
+            <p class="plan-name">Professional</p>
+            <div class="plan-price"><sup>$</sup>29<span>/mo</span></div>
+            <p class="plan-desc">For growing organizations that need more power.</p>
+            <ul class="plan-features">
+              <li><i class="bi bi-check-circle-fill"></i> Up to 500 members</li>
+              <li><i class="bi bi-check-circle-fill"></i> Unlimited events</li>
+              <li><i class="bi bi-check-circle-fill"></i> Advanced analytics</li>
+              <li><i class="bi bi-check-circle-fill"></i> Payment processing</li>
+              <li><i class="bi bi-check-circle-fill"></i> Custom workflows</li>
+              <li><i class="bi bi-x-circle-fill"></i> Priority support</li>
+            </ul>
+            <a href="register.html" class="btn-plan btn-plan-filled">Start Free Trial</a>
+          </div>
+        </div>
+
+        <!-- Enterprise -->
+        <div class="col-md-6 col-lg-4 fade-up" style="transition-delay:0.2s">
+          <div class="pricing-card">
+            <p class="plan-name">Enterprise</p>
+            <div class="plan-price"><sup>$</sup>99<span>/mo</span></div>
+            <p class="plan-desc">For large organizations requiring full control and support.</p>
+            <ul class="plan-features">
+              <li><i class="bi bi-check-circle-fill"></i> Unlimited members</li>
+              <li><i class="bi bi-check-circle-fill"></i> Unlimited events</li>
+              <li><i class="bi bi-check-circle-fill"></i> Full reporting suite</li>
+              <li><i class="bi bi-check-circle-fill"></i> Payment processing</li>
+              <li><i class="bi bi-check-circle-fill"></i> Custom workflows</li>
+              <li><i class="bi bi-check-circle-fill"></i> Priority support</li>
+            </ul>
+            <a href="register.html" class="btn-plan btn-plan-outline">Contact Sales</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════ BLOG ══════════════════════════════ -->
+  <section class="blog" id="blog">
+    <div class="container">
+      <div class="text-center">
+        <span class="section-label">Latest Updates</span>
+        <h2 class="section-title">News, tips, and product updates</h2>
+        <p class="section-desc">Stay informed with the latest feature releases, event management best practices, and success stories from our community.</p>
+      </div>
+      <div class="blog-grid">
+        <div class="blog-card fade-up">
+          <h5>Launch your first event in minutes</h5>
+          <p>Learn how to create an event, invite members, and track RSVPs using the new event workflow.</p>
+          <small>July 2, 2026 · Event Management</small>
+        </div>
+        <div class="blog-card fade-up" style="transition-delay:0.1s">
+          <h5>Secure role-based access for all users</h5>
+          <p>Discover how OrgMember keeps your organization safe with separate permissions for admins and members.</p>
+          <small>June 18, 2026 · Security</small>
+        </div>
+        <div class="blog-card fade-up" style="transition-delay:0.2s">
+          <h5>Reduce dues collection with smart payments</h5>
+          <p>See how automated payment tracking removes manual follow-up and keeps your finance team on track.</p>
+          <small>June 4, 2026 · Payments</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════ TESTIMONIALS ══════════════════════════════ -->
+  <section class="testimonials" id="testimonials">
+    <div class="container">
+      <div class="text-center">
+        <span class="section-label">Trusted by Organizations</span>
+        <h2 class="section-title">What our users say</h2>
+        <p class="section-desc">Thousands of organizations trust OrgMember to manage their communities.</p>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-4 fade-up">
+          <div class="testi-card">
+            <div class="testi-stars">
+              <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+            </div>
+            <p class="testi-text">"OrgMember completely transformed how we manage our 300-member association. The event tools alone saved us hours every month."</p>
+            <div class="testi-author">
+              <div class="testi-avatar">NM</div>
+              <div>
+                <p class="testi-name">Nesru Moh</p>
+                <p class="testi-role">President, Youth Connect Africa</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 fade-up" style="transition-delay:0.1s">
+          <div class="testi-card">
+            <div class="testi-stars">
+              <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+            </div>
+            <p class="testi-text">"The payment tracking feature is incredible. We went from chasing members for dues to having everything automated and visible."</p>
+            <div class="testi-author">
+              <div class="testi-avatar">AM</div>
+              <div>
+                <p class="testi-name">Ahmed Moh</p>
+                <p class="testi-role">Treasurer, Engineers Guild</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 fade-up" style="transition-delay:0.2s">
+          <div class="testi-card">
+            <div class="testi-stars">
+              <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i>
+            </div>
+            <p class="testi-text">"Setting up was so easy. Within one day we had all our members onboard and our first event published. Highly recommend!"</p>
+            <div class="testi-author">
+              <div class="testi-avatar">FN</div>
+              <div>
+                <p class="testi-name">Hindi Moh</p>
+                <p class="testi-role">Admin, Women in Tech NG</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════ CONTACT ══════════════════════════════ -->
+  <section class="contact-section" id="contact">
+    <div class="container">
+      <div class="text-center">
+        <span class="section-label">Get in Touch</span>
+        <h2 class="section-title">Questions? We’re here to help</h2>
+        <p class="section-desc">Whether you have a product question or want help onboarding your organization, send us a message and we’ll respond quickly.</p>
+      </div>
+      <div class="contact-grid">
+        <div class="contact-card fade-up">
+          <h4>Contact details</h4>
+          <div class="contact-detail">
+            <i class="bi bi-geo-alt-fill"></i>
+            <p>Dire Dawa, Ethiopia<br>Near Dire Dawa University</p>
+          </div>
+          <div class="contact-detail">
+            <i class="bi bi-envelope-fill"></i>
+            <p>info@orgmember.com</p>
+          </div>
+          <div class="contact-detail">
+            <i class="bi bi-telephone-fill"></i>
+            <p>+251 939 696 877</p>
+          </div>
+          <div class="contact-detail">
+            <i class="bi bi-clock-fill"></i>
+            <p>Mon – Fri, 9:00 AM – 6:00 PM</p>
+          </div>
+        </div>
+        <form class="contact-form fade-up">
+          <input type="text" placeholder="Your name" required />
+          <input type="email" placeholder="Email address" required />
+          <textarea placeholder="How can we help you?" required></textarea>
+          <button type="submit">Send Message</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════ CTA ══════════════════════════════ -->
+  <section class="cta-section">
+    <div class="container">
+      <h2>Ready to Transform Your<br><span style="color:var(--accent)">Membership Management?</span></h2>
+      <p>Join thousands of organizations already using OrgMember. Start free — no credit card required.</p>
+      <div class="cta-btns">
+        <a href="register.html" class="btn-accent" style="padding: 13px 32px; font-size: 0.95rem;">
+          <i class="bi bi-rocket-takeoff me-2"></i>Start for Free
+        </a>
+        <a href="#features" class="btn-outline-hero">
+          <i class="bi bi-info-circle"></i> Learn More
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════ FOOTER ══════════════════════════════ -->
+  <footer>
+    <div class="container">
+      <div class="row g-5">
+        <div class="col-lg-4">
+          <a href="#" class="footer-brand">
+            <div class="brand-icon"><i class="bi bi-diagram-3-fill"></i></div>
+            OrgMember
+          </a>
+          <p class="footer-desc">
+            The all-in-one platform to manage your organization's members, events, payments and workflows.
+          </p>
+        </div>
+        <div class="col-6 col-lg-2">
+          <p class="footer-heading">Product</p>
+          <ul class="footer-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#pricing">Pricing</a></li>
+            <li><a href="#how-it-works">How it Works</a></li>
+            <li><a href="#">Changelog</a></li>
+          </ul>
+        </div>
+        <div class="col-6 col-lg-2">
+          <p class="footer-heading">Company</p>
+          <ul class="footer-links">
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Events</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div>
+        <div class="col-6 col-lg-2">
+          <p class="footer-heading">Support</p>
+          <ul class="footer-links">
+            <li><a href="#">Documentation</a></li>
+            <li><a href="#">Help Center</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Use</a></li>
+          </ul>
+        </div>
+        <div class="col-6 col-lg-2">
+          <p class="footer-heading">Account</p>
+          <ul class="footer-links">
+            <li><a href="login.html">Sign In</a></li>
+            <li><a href="register.html">Register</a></li>
+            <li><a href="#">Dashboard</a></li>
+            <li><a href="#">Settings</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>© 2026 OrgMember. All rights reserved.</p>
+        <div class="social-links">
+          <a href="#"><i class="bi bi-twitter-x"></i></a>
+          <a href="#"><i class="bi bi-linkedin"></i></a>
+          <a href="#"><i class="bi bi-github"></i></a>
+          <a href="#"><i class="bi bi-instagram"></i></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="theme-toggle.js"></script>
+
+  <!-- Hero Background Slider (Vanilla JS) -->
+  <script>
+    // Get all slides and dots
+    const slides = document.querySelectorAll('.hero-slide');
+    const dots   = document.querySelectorAll('.hero-dot');
+    let current  = 0;      // which slide is showing now
+    let timer;             // stores the auto-play interval
+
+    // Show a specific slide
+    function goToSlide(index) {
+      // Remove 'active' from current slide and dot
+      slides[current].classList.remove('active');
+      dots[current].classList.remove('active');
+
+      // Update current
+      current = index;
+
+      // Add 'active' to new slide and dot
+      slides[current].classList.add('active');
+      dots[current].classList.add('active');
+
+      // Restart the auto timer so clicking a dot resets the 5s countdown
+      clearInterval(timer);
+      startAutoPlay();
+    }
+
+    // Move to next slide (loops back to 0 after the last one)
+    function nextSlide() {
+      let next = (current + 1) % slides.length;
+      goToSlide(next);
+    }
+
+    // Start auto-playing every 5 seconds
+    function startAutoPlay() {
+      timer = setInterval(nextSlide, 5000);
+    }
+
+    startAutoPlay(); // Kick it off when the page loads
+  </script>
+
+  <!-- Scroll Fade Animation -->
+  <script>
+    // Fade-up animation using IntersectionObserver (pure Vanilla JS DOM!)
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+    // Smooth active nav link on scroll
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(section => {
+        if (window.scrollY >= section.offsetTop - 100) {
+          current = section.getAttribute('id');
+        }
+      });
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + current) {
+          link.classList.add('active');
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

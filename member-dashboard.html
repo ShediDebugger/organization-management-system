@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Member Dashboard — OrgMember</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg-dark:      #f8fafc;
+      --bg-card:      #ffffff;
+      --bg-card-2:    #f4f7fb;
+      --accent:       #f5a623;
+      --accent-hover: #e09520;
+      --accent-light: rgba(245,166,35,0.12);
+      --text-white:   #0b1628;
+      --text-muted:   #556c89;
+      --text-dim:     #6b7b8f;
+      --border:       rgba(15,23,42,0.08);
+      --nav-bg:       #ffffff;
+      --navbar-toggler-icon-filter: invert(0);
+      --radius:       12px;
+      --success:      #4cd177;
+      --warning:      #ffa800;
+      --danger:       #ff6b6b;
+    }
+
+    .theme-feature {
+      --bg-dark:      #0b1628;
+      --bg-card:      #11213a;
+      --bg-card-2:    #162340;
+      --accent:       #f5a623;
+      --accent-hover: #e09520;
+      --accent-light: rgba(245,166,35,0.12);
+      --text-white:   #ffffff;
+      --text-muted:   #8fa8c8;
+      --text-dim:     #5a9a9a;
+      --border:       rgba(255,255,255,0.07);
+      --nav-bg:       rgba(11,22,40,0.95);
+      --navbar-toggler-icon-filter: invert(1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg-dark);
+      color: var(--text-white);
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      min-height: 100vh;
+    }
+    h1, h2, h3 { font-family: 'Playfair Display', serif; font-weight: 700; }
+
+    .dashboard-wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 260px;
+      background: var(--bg-card);
+      border-right: 1px solid var(--border);
+      padding: 24px 16px;
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--text-white);
+      margin-bottom: 32px;
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 30px; height: 30px;
+      background: var(--accent);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: var(--bg-dark);
+    }
+
+    .sidebar-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .menu-item {
+      margin-bottom: 8px;
+    }
+
+    .menu-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: var(--radius);
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .menu-link:hover {
+      background: rgba(245,166,35,0.1);
+      color: var(--accent);
+    }
+
+    .menu-link.active {
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    .menu-icon {
+      font-size: 1.1rem;
+      width: 20px;
+    }
+
+    .sidebar-footer {
+      margin-top: 32px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      margin-bottom: 12px;
+    }
+
+    .user-avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--accent-light);
+      border: 2px solid var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .user-details {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .user-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-white);
+    }
+
+    .user-email {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+
+    .logout-btn {
+      width: 100%;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 10px;
+      border-radius: var(--radius);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .logout-btn:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    /* ── Main Content ── */
+    .main-content {
+      flex: 1;
+      margin-left: 260px;
+      padding: 32px;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
+    }
+
+    .page-title {
+      font-size: 1.8rem;
+    }
+
+    .user-profile-dropdown {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 0;
+    }
+
+    .user-dropdown-wrapper {
+      position: relative;
+    }
+
+    .user-dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      min-width: 200px;
+      margin-top: 8px;
+      display: none;
+      z-index: 1000;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .user-dropdown-menu.show {
+      display: block;
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+      border: none;
+      background: transparent;
+      width: 100%;
+      cursor: pointer;
+      text-align: left;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .dropdown-item:hover {
+      background: rgba(245,166,35,0.1);
+      color: var(--accent);
+    }
+
+    .dropdown-item.dropdown-header {
+      font-weight: 600;
+      color: var(--text-white);
+      cursor: default;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dropdown-item.dropdown-header:hover {
+      background: transparent;
+      color: var(--text-white);
+    }
+
+    .dropdown-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 0;
+    }
+
+    /* ── Tabs ── */
+    .tab-buttons {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 28px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 14px 16px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-bottom: 2px solid transparent;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .tab-btn:hover {
+      color: var(--accent);
+    }
+
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* ═══════════════════════════ OVERVIEW TAB ═══════════════════════════ */
+    
+    .welcome-banner {
+      background: #2563eb;
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 28px;
+      color: white;
+    }
+
+    .welcome-banner h2 {
+      font-size: 1.5rem;
+      margin-bottom: 4px;
+      color: white;
+    }
+
+    .welcome-banner p {
+      margin: 0;
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    .stat-cards-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+
+    .stat-main {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text-white);
+      margin-bottom: 8px;
+    }
+
+    .stat-sub {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+
+    .stat-main.active {
+      color: var(--success);
+    }
+
+    .stat-main.warning {
+      color: var(--warning);
+    }
+
+    /* ── Two Column Layout ── */
+    .two-column {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+
+    .section-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-white);
+      margin: 0;
+    }
+
+    .view-all-link {
+      font-size: 0.8rem;
+      color: #2563eb;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .view-all-link:hover {
+      text-decoration: underline;
+    }
+
+    .event-item {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .event-item:last-child {
+      border-bottom: none;
+    }
+
+    .event-info {
+      flex: 1;
+    }
+
+    .event-name {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-white);
+      margin-bottom: 2px;
+    }
+
+    .event-date {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+
+    .rsvp-btn {
+      background: #2563eb;
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .rsvp-btn:hover {
+      background: #1d4ed8;
+    }
+
+    .payment-item {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .payment-item:last-child {
+      border-bottom: none;
+    }
+
+    .payment-info {
+      flex: 1;
+    }
+
+    .payment-desc {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-white);
+      margin-bottom: 2px;
+    }
+
+    .payment-date {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+
+    .payment-amount {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--success);
+    }
+
+    /* ═══════════════════════════ PROFILE TAB ═══════════════════════════ */
+
+    .profile-header {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .profile-pic-section {
+      flex: 0 0 auto;
+    }
+
+    .profile-pic {
+      width: 120px;
+      height: 120px;
+      background: var(--accent-light);
+      border: 3px solid var(--accent);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .change-photo-link {
+      font-size: 0.8rem;
+      color: #2563eb;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .change-photo-link:hover {
+      text-decoration: underline;
+    }
+
+    .profile-info-section {
+      flex: 1;
+    }
+
+    .edit-profile-btn {
+      background: #2563eb;
+      border: none;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      margin-bottom: 16px;
+    }
+
+    .edit-profile-btn:hover {
+      background: #1d4ed8;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .info-item {
+      font-size: 0.85rem;
+    }
+
+    .info-label {
+      color: var(--text-dim);
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+
+    .info-value {
+      color: var(--text-white);
+      font-weight: 600;
+    }
+
+    .form-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .form-section-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-white);
+      margin-bottom: 20px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .form-row.full {
+      grid-template-columns: 1fr;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-white);
+      margin-bottom: 6px;
+    }
+
+    .form-control {
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      color: var(--text-white);
+      padding: 10px 12px;
+      border-radius: var(--radius);
+      font-size: 0.9rem;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .form-control::placeholder {
+      color: var(--text-dim);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(245,166,35,0.1);
+    }
+
+    /* ═══════════════════════════ EVENTS TAB ═══════════════════════════ */
+
+    .events-header {
+      margin-bottom: 24px;
+    }
+
+    .events-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-white);
+      margin-bottom: 4px;
+    }
+
+    .events-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .filter-buttons {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+    }
+
+    .filter-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .filter-btn.active {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: white;
+    }
+
+    .view-toggle {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .toggle-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+    }
+
+    .toggle-btn.active {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: white;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .calendar-day-group {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+
+    .calendar-day-title {
+      margin: 0 0 14px;
+      font-size: 1.05rem;
+      color: var(--text-white);
+    }
+
+    .calendar-event-card {
+      background: #122037;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .calendar-event-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .calendar-event-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .calendar-event-desc {
+      color: var(--text-dim);
+      line-height: 1.6;
+      font-size: 0.92rem;
+    }
+
+    .event-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .event-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .event-card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-white);
+    }
+
+    .event-card-badge {
+      background: rgba(37,99,235,0.15);
+      color: #2563eb;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .event-card-meta {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 12px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .event-card-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .event-card-desc {
+      color: var(--text-white);
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .event-card-agenda {
+      background: var(--bg-card-2);
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .agenda-item {
+      margin-bottom: 4px;
+    }
+
+    .agenda-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .event-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .rsvp-status {
+      display: flex;
+      gap: 6px;
+    }
+
+    .rsvp-option {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .rsvp-option:hover {
+      border-color: var(--accent);
+    }
+
+    .rsvp-option.yes {
+      border-color: var(--success);
+      color: var(--success);
+      background: rgba(76,209,119,0.1);
+    }
+
+    .rsvp-option.maybe {
+      border-color: var(--warning);
+      color: var(--warning);
+      background: rgba(255,168,0,0.1);
+    }
+
+    .rsvp-option.no {
+      border-color: var(--danger);
+      color: var(--danger);
+      background: rgba(255,107,107,0.1);
+    }
+
+    .download-ticket-btn {
+      background: #2563eb;
+      border: none;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .download-ticket-btn:hover {
+      background: #1d4ed8;
+    }
+
+    .event-attended {
+      color: var(--success);
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .event-past {
+      color: var(--text-dim);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+
+    @media (max-width: 1024px) {
+      .two-column { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar { width: 100%; height: auto; position: relative; border-bottom: 1px solid var(--border); }
+      .main-content { margin-left: 0; padding: 20px; }
+      .profile-header { flex-direction: column; }
+      .info-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="dashboard-wrapper">
+
+    <!-- ═══════════════════════════ SIDEBAR ═══════════════════════════ -->
+    <aside class="sidebar">
+
+      <a href="index.html" class="sidebar-logo">
+        <div class="logo-icon"><i class="bi bi-diagram-3-fill"></i></div>
+        <span id="sidebar-org-name">OrgMember</span>
+      </a>
+
+      <ul class="sidebar-menu">
+        <li class="menu-item">
+          <div class="menu-link active" onclick="switchTab('overview')">
+            <i class="bi bi-house-fill menu-icon"></i>
+            <span>Overview</span>
+          </div>
+        </li>
+        <li class="menu-item">
+          <div class="menu-link" onclick="switchTab('profile')">
+            <i class="bi bi-person-fill menu-icon"></i>
+            <span>Profile</span>
+          </div>
+        </li>
+        <li class="menu-item">
+          <div class="menu-link" onclick="switchTab('events')">
+            <i class="bi bi-calendar-event menu-icon"></i>
+            <span>Events</span>
+          </div>
+        </li>
+        <li class="menu-item">
+          <div class="menu-link" onclick="switchTab('blog')">
+            <i class="bi bi-newspaper menu-icon"></i>
+            <span>Blog</span>
+          </div>
+        </li>
+        <li class="menu-item">
+          <div class="menu-link" onclick="switchTab('payments')">
+            <i class="bi bi-credit-card menu-icon"></i>
+            <span>Payments</span>
+          </div>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="user-avatar" id="sidebar-avatar">-</div>
+          <div class="user-details">
+            <div class="user-name" id="sidebar-user-name">-</div>
+            <div class="user-email" id="sidebar-user-email">-</div>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- ═══════════════════════════ MAIN CONTENT ═══════════════════════════ -->
+    <main class="main-content">
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1 class="page-title">Member Dashboard</h1>
+        <div class="user-dropdown-wrapper">
+          <button class="user-profile-dropdown" onclick="toggleUserDropdown()" id="header-user-btn">
+            -
+             <i class="bi bi-chevron-down"></i>
+          </button>
+          <div class="user-dropdown-menu" id="userDropdown">
+            <div class="dropdown-item dropdown-header" id="header-dropdown-name">-</div>
+            <a href="#" class="dropdown-item" onclick="switchTab('profile'); closeUserDropdown(); return false;">
+              <i class="bi bi-person me-2"></i>Profile
+            </a>
+            <a href="#" class="dropdown-item" onclick="handleLogout(); return false;">
+              <i class="bi bi-box-arrow-right me-2"></i>Log Out
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════ OVERVIEW TAB ═══════════════════════════ -->
+      <div id="overview-tab" class="tab-content active">
+
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+          <h2 id="welcome-title">Welcome back!</h2>
+          <p>Here's your membership overview for today</p>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="stat-cards-row">
+          <div class="stat-card">
+            <div class="stat-label">Membership Status</div>
+            <div class="stat-main active" id="stat-mem-status">Active</div>
+            <div class="stat-sub" id="stat-mem-sub">
+              Loading...
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Upcoming Events</div>
+            <div class="stat-main" id="stat-upcoming-count">-</div>
+            <div class="stat-sub" id="stat-upcoming-sub">Next: Board Meeting – Sep 15, 10:00 AM</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Outstanding Dues</div>
+            <div class="stat-main warning" id="stat-dues-count">ETB 0.00</div>
+            <div class="stat-sub" id="stat-dues-sub">
+              All payments up to date
+            </div>
+          </div>
+        </div>
+
+        <!-- Two Column Layout -->
+        <div class="two-column">
+
+          <!-- Upcoming Events -->
+          <div class="section-box">
+            <div class="section-header">
+              <h3 class="section-title">Upcoming Events</h3>
+              <a href="#" class="view-all-link" onclick="switchTab('events'); return false;">View All</a>
+            </div>
+            <div id="overview-events-container">
+              <!-- Dynamic Events -->
+            </div>
+          </div>
+
+          <!-- Recent Payments -->
+          <div class="section-box">
+            <div class="section-header">
+              <h3 class="section-title">Recent Payments</h3>
+              <a href="#" class="view-all-link" onclick="switchTab('payments'); return false;">View All</a>
+            </div>
+            <div id="overview-payments-container">
+              <!-- Dynamic Payments -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ═══════════════════════════ PROFILE TAB ═══════════════════════════ -->
+      <div id="profile-tab" class="tab-content">
+
+        <h2 style="font-size: 1.3rem; margin-bottom: 4px;">Membership Profile</h2>
+        <p style="color: var(--text-muted); margin-bottom: 24px;">Manage your personal information and membership details</p>
+
+        <!-- Profile Header -->
+        <div class="profile-header">
+          <div class="profile-pic-section">
+            <div class="profile-pic">👤</div>
+            <a href="#" class="change-photo-link">Change Photo</a>
+          </div>
+          <div class="profile-info-section">
+            <button class="edit-profile-btn">
+              <i class="bi bi-pencil me-2"></i>Edit Profile
+            </button>
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-label">Membership Type:</div>
+                <div class="info-value" id="profile-type-val">-</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Member Since:</div>
+                <div class="info-value" id="profile-joined-val">-</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Status:</div>
+                <div class="info-value" id="profile-status-val" style="color: var(--success);">-</div>
+              </div>
+              <div class="info-item" style="grid-column: 1 / -1;">
+                <div class="info-label">Role:</div>
+                <div class="info-value" id="profile-role-val">-</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <form id="profileForm" onsubmit="submitProfileUpdate(event)">
+          <!-- Personal Information Form -->
+          <div class="form-section">
+            <h3 class="form-section-title">Personal Information</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">First Name</label>
+                <input type="text" class="form-control" id="profile-first-name" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Last Name</label>
+                <input type="text" class="form-control" id="profile-last-name" />
+              </div>
+            </div>
+            <div class="form-row full">
+              <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="profile-email" disabled />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <input type="tel" class="form-control" id="profile-phone" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Address</label>
+                <input type="text" class="form-control" id="profile-address" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">City</label>
+                <input type="text" class="form-control" id="profile-city" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">State</label>
+                <input type="text" class="form-control" id="profile-state" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">ZIP Code</label>
+                <input type="text" class="form-control" id="profile-zip" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Date of Birth</label>
+                <input type="date" class="form-control" id="profile-dob" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Emergency Contact Form -->
+          <div class="form-section">
+            <h3 class="form-section-title">Emergency Contact</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Contact Name</label>
+                <input type="text" class="form-control" id="profile-emergency-name" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Contact Phone</label>
+                <input type="tel" class="form-control" id="profile-emergency-phone" />
+              </div>
+            </div>
+          </div>
+
+          <div style="text-align: right; margin-bottom: 24px;">
+            <button type="submit" class="edit-profile-btn" style="background: var(--accent); color: var(--bg-dark); border: none;">
+              <i class="bi bi-check-lg me-2"></i>Save Profile
+            </button>
+          </div>
+        </form>
+
+      </div>
+
+      <!-- ═══════════════════════════ EVENTS TAB ═══════════════════════════ -->
+      <div id="events-tab" class="tab-content">
+
+        <div class="events-header">
+          <h2 class="events-title">
+            <i class="bi bi-calendar-event me-2"></i>Event Participation
+          </h2>
+          <p class="events-subtitle">Browse events, RSVP, and manage your participation</p>
+        </div>
+
+        <!-- View Toggle -->
+        <div class="view-toggle">
+          <button class="toggle-btn active" onclick="setEventView('list', this)">
+            <i class="bi bi-list-ul me-2"></i>List
+          </button>
+          <button class="toggle-btn" onclick="setEventView('calendar', this)">
+            <i class="bi bi-calendar me-2"></i>Calendar
+          </button>
+        </div>
+
+        <!-- Filter Buttons -->
+        <div class="filter-buttons">
+          <button class="filter-btn active" onclick="filterEvents('All', this)">All</button>
+          <button class="filter-btn" onclick="filterEvents('Meeting', this)">Meeting</button>
+          <button class="filter-btn" onclick="filterEvents('Volunteer', this)">Volunteer</button>
+          <button class="filter-btn" onclick="filterEvents('Fundraiser', this)">Fundraiser</button>
+          <button class="filter-btn" onclick="filterEvents('Training', this)">Training</button>
+        </div>
+
+        <!-- Event Cards -->
+        <div id="events-list-container">
+          <!-- Dynamic Events -->
+        </div>
+        <div id="events-calendar-container" class="hidden">
+          <!-- Calendar view events -->
+        </div>
+
+      </div>
+
+      <!-- ═══════════════════════════ OTHER TABS (PLACEHOLDER) ═══════════════════════════ -->
+      <div id="blog-tab" class="tab-content">
+        <div class="section-box">
+          <h3 class="section-title">Organization Announcements</h3>
+          <div id="blog-posts-container" style="margin-top: 20px;">
+            <!-- Dynamic Blog Posts -->
+          </div>
+        </div>
+      </div>
+
+      <div id="payments-tab" class="tab-content">
+        <div class="section-box">
+          <h3 class="section-title">My Payments & Dues</h3>
+          <div class="table-wrapper" style="margin-top: 20px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Description</th>
+                  <th>Amount</th>
+                  <th>Type</th>
+                  <th>Due Date</th>
+                  <th>Paid Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="member-payments-body">
+                <!-- Dynamic Payments -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="theme-toggle.js"></script>
+
+  <script>
+    let currentMemberProfile = null;
+    let allEvents = [];
+    let currentEventView = 'list';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAuth();
+    });
+
+    function checkAuth() {
+      fetch('http://localhost:3000/api/auth/me', { credentials: 'include' })
+        .then(res => {
+          if (res.status === 401) {
+            window.location.href = 'login.html';
+            return Promise.reject(new Error('Unauthorized'));
+          }
+          return res.json();
+        })
+        .then(data => {
+          if (data && data.success) {
+            if (data.user.role !== 'member') {
+              window.location.href = 'login.html';
+              return;
+            }
+            loadProfile();
+          }
+        })
+        .catch(err => {
+          console.error('Auth check failed:', err);
+          if (!window.location.href.endsWith('login.html')) {
+            window.location.href = 'login.html';
+          }
+        });
+    }
+
+    function loadProfile() {
+      fetch('http://localhost:3000/api/members/profile', { credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            currentMemberProfile = data.user;
+            
+            // Populate sidebar / header info
+            document.getElementById('sidebar-org-name').textContent = currentMemberProfile.org_name || 'OrgMember';
+            
+            const initials = currentMemberProfile.full_name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+            document.getElementById('sidebar-avatar').textContent = initials || 'MB';
+            document.getElementById('sidebar-user-name').textContent = currentMemberProfile.full_name;
+            document.getElementById('sidebar-user-email').textContent = currentMemberProfile.email;
+            
+            document.getElementById('header-user-btn').innerHTML = `${currentMemberProfile.full_name} <i class="bi bi-chevron-down"></i>`;
+            document.getElementById('header-dropdown-name').textContent = currentMemberProfile.full_name;
+            
+            // Populate Overview Welcome
+            document.getElementById('welcome-title').textContent = `Welcome back, ${currentMemberProfile.full_name}!`;
+            
+            // Update Stats cards
+            document.getElementById('stat-mem-status').textContent = currentMemberProfile.status.toUpperCase();
+            document.getElementById('stat-mem-status').className = `stat-main ${currentMemberProfile.status === 'active' ? 'active' : 'warning'}`;
+            document.getElementById('stat-mem-sub').innerHTML = `${currentMemberProfile.org_name || 'Organization Member'}`;
+            
+            // Populate form values
+            const names = currentMemberProfile.full_name.split(' ');
+            document.getElementById('profile-first-name').value = currentMemberProfile.first_name || names[0] || '';
+            document.getElementById('profile-last-name').value = currentMemberProfile.last_name || names.slice(1).join(' ') || '';
+            document.getElementById('profile-email').value = currentMemberProfile.email || '';
+            document.getElementById('profile-phone').value = currentMemberProfile.phone || '';
+            document.getElementById('profile-address').value = currentMemberProfile.address || '';
+            document.getElementById('profile-city').value = currentMemberProfile.city || '';
+            document.getElementById('profile-state').value = currentMemberProfile.state || '';
+            document.getElementById('profile-zip').value = currentMemberProfile.zip_code || '';
+            
+            if (currentMemberProfile.date_of_birth) {
+              document.getElementById('profile-dob').value = currentMemberProfile.date_of_birth.substring(0, 10);
+            }
+            
+            document.getElementById('profile-emergency-name').value = currentMemberProfile.emergency_name || '';
+            document.getElementById('profile-emergency-phone').value = currentMemberProfile.emergency_phone || '';
+            
+            // Populate profile metadata panel labels
+            document.getElementById('profile-type-val').textContent = 'Active Member';
+            document.getElementById('profile-joined-val').textContent = new Date(currentMemberProfile.created_at).toLocaleDateString();
+            document.getElementById('profile-status-val').textContent = currentMemberProfile.status;
+            document.getElementById('profile-status-val').style.color = currentMemberProfile.status === 'active' ? 'var(--success)' : 'var(--warning)';
+            document.getElementById('profile-role-val').textContent = currentMemberProfile.role_in_org || 'Member';
+
+            // Load additional data
+            loadOverviewData();
+          }
+        })
+        .catch(err => console.error('Failed to load profile:', err));
+    }
+
+    function loadOverviewData() {
+      const upcomingSubEl = document.getElementById('stat-upcoming-sub');
+      const upcomingCountEl = document.getElementById('stat-upcoming-count');
+      const overviewContainer = document.getElementById('overview-events-container');
+
+      if (!currentMemberProfile || !currentMemberProfile.org_id) {
+        upcomingCountEl.textContent = '0';
+        upcomingSubEl.textContent = 'No organization assigned';
+        overviewContainer.innerHTML = '<p style="font-size:0.85rem; color:var(--text-dim); padding:10px 0;">Join an organization to see upcoming events.</p>';
+        return;
+      }
+      
+      // Load upcoming events for Overview and count
+      fetch(`http://localhost:3000/api/events?org_id=${currentMemberProfile.org_id}`, { credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            allEvents = data.events;
+            const upcomingEvents = allEvents
+              .filter(e => new Date(e.start_time) > new Date())
+              .sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+
+            const upcomingCount = upcomingEvents.length;
+            upcomingCountEl.textContent = upcomingCount;
+
+            const upcomingSub = upcomingEvents[0]
+              ? `Next: ${upcomingEvents[0].title} – ${new Date(upcomingEvents[0].start_time).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}`
+              : 'No upcoming events';
+            upcomingSubEl.textContent = upcomingSub;
+
+            overviewContainer.innerHTML = '';
+            const overviewEvents = upcomingEvents.slice(0, 3);
+            if (overviewEvents.length === 0) {
+              overviewContainer.innerHTML = '<p style="font-size:0.85rem; color:var(--text-dim); padding:10px 0;">No upcoming events</p>';
+            } else {
+              overviewEvents.forEach(evt => {
+                const div = document.createElement('div');
+                div.className = 'event-item';
+                div.innerHTML = `
+                  <div class="event-info">
+                    <div class="event-name">${evt.title}</div>
+                    <div class="event-date">${new Date(evt.start_time).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} · ${evt.event_type}</div>
+                  </div>
+                  <button class="rsvp-btn" onclick="switchTab('events')">RSVP</button>
+                `;
+                overviewContainer.appendChild(div);
+              });
+            }
+          }
+        });
+
+      // Load my payments
+      fetch(`http://localhost:3000/api/payments/my`, { credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            const payments = data.payments;
+            
+            // Calculate outstanding dues (sum of amount where status = 'pending')
+            const pendingPayments = payments.filter(p => p.status === 'pending');
+            const totalPending = pendingPayments.reduce((sum, p) => sum + Number(p.amount), 0);
+            document.getElementById('stat-dues-count').textContent = `USD ${totalPending.toFixed(2)}`;
+            document.getElementById('stat-dues-count').className = `stat-main ${totalPending > 0 ? 'warning' : 'active'}`;
+            document.getElementById('stat-dues-sub').innerHTML = totalPending > 0 ? `${pendingPayments.length} pending invoice(s)` : 'All payments up to date';
+
+            // Populate overview payments list (limit 2)
+            const container = document.getElementById('overview-payments-container');
+            container.innerHTML = '';
+            const recent = payments.slice(0, 2);
+            if (recent.length === 0) {
+              container.innerHTML = '<p style="font-size:0.85rem; color:var(--text-dim); padding:10px 0;">No payment history</p>';
+            } else {
+              recent.forEach(pay => {
+                const div = document.createElement('div');
+                div.className = 'payment-item';
+                div.innerHTML = `
+                  <div class="payment-info">
+                    <div class="payment-desc">${pay.description || 'Membership Dues'}</div>
+                  </div>
+                  <div class="payment-amount" style="color: ${pay.status === 'paid' ? 'var(--success)' : 'var(--warning)'}">
+                    ${pay.currency} ${Number(pay.amount).toFixed(2)} ${pay.status.toUpperCase()}
+                  </div>
+                `;
+                container.appendChild(div);
+              });
+            }
+          }
+        });
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.menu-link').forEach(link => link.classList.remove('active'));
+      
+      document.getElementById(tabName + '-tab').classList.add('active');
+      
+      // Highlight correct sidebar link
+      document.querySelectorAll('.menu-link').forEach(link => {
+        if (link.getAttribute('onclick').includes(tabName)) {
+          link.classList.add('active');
+        }
+      });
+
+      if (tabName === 'overview') {
+        loadOverviewData();
+      } else if (tabName === 'events') {
+        loadEventsList();
+      } else if (tabName === 'blog') {
+        loadAnnouncements();
+      } else if (tabName === 'payments') {
+        loadPaymentsList();
+      }
+    }
+
+    function loadEventsList() {
+      if (!currentMemberProfile || !currentMemberProfile.org_id) {
+        const listContainer = document.getElementById('events-list-container');
+        const calendarContainer = document.getElementById('events-calendar-container');
+        listContainer.style.display = 'block';
+        calendarContainer.style.display = 'none';
+        listContainer.innerHTML = '<p class="text-center text-muted">No organization assigned. Join your organization to view events.</p>';
+        return;
+      }
+      fetch(`http://localhost:3000/api/events?org_id=${currentMemberProfile.org_id}`, { credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            allEvents = data.events;
+            renderEventView();
+          }
+        });
+    }
+
+    function setEventView(view, btn) {
+      currentEventView = view;
+      document.querySelectorAll('.toggle-btn').forEach(button => button.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderEventView();
+    }
+
+    function renderEventView() {
+      const listContainer = document.getElementById('events-list-container');
+      const calendarContainer = document.getElementById('events-calendar-container');
+      if (currentEventView === 'calendar') {
+        listContainer.style.display = 'none';
+        calendarContainer.style.display = 'block';
+        displayCalendar(allEvents);
+      } else {
+        listContainer.style.display = 'block';
+        calendarContainer.style.display = 'none';
+        displayEvents(allEvents);
+      }
+    }
+
+    function displayCalendar(events) {
+      const container = document.getElementById('events-calendar-container');
+      container.innerHTML = '';
+      if (!events || events.length === 0) {
+        container.innerHTML = '<p class="text-center text-muted">No events found for your organization</p>';
+        return;
+      }
+      const grouped = {};
+      events
+        .slice()
+        .sort((a, b) => new Date(a.start_time) - new Date(b.start_time))
+        .forEach(evt => {
+          const dateKey = new Date(evt.start_time).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
+          grouped[dateKey] = grouped[dateKey] || [];
+          grouped[dateKey].push(evt);
+        });
+
+      Object.entries(grouped).forEach(([date, items]) => {
+        const daySection = document.createElement('div');
+        daySection.className = 'calendar-day-group';
+        daySection.innerHTML = `<h4 class="calendar-day-title">${date}</h4>`;
+        items.forEach(evt => {
+          const card = document.createElement('div');
+          card.className = 'calendar-event-card';
+          card.innerHTML = `
+            <div class="calendar-event-header">
+              <strong>${evt.title}</strong>
+              <span>${evt.event_type}</span>
+            </div>
+            <div class="calendar-event-meta">
+              <span>${new Date(evt.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+              <span>${evt.location || 'N/A'}</span>
+            </div>
+            <div class="calendar-event-desc">${evt.description || ''}</div>
+          `;
+          daySection.appendChild(card);
+        });
+        container.appendChild(daySection);
+      });
+    }
+
+    function displayEvents(events) {
+      const container = document.getElementById('events-list-container');
+      container.innerHTML = '';
+      if (events.length === 0) {
+        container.innerHTML = '<p class="text-center text-muted">No events found for your organization</p>';
+        return;
+      }
+      events.forEach(evt => {
+        const div = document.createElement('div');
+        div.className = 'event-card';
+        const isPast = new Date(evt.end_time || evt.start_time) < new Date();
+        const myRsvp = evt.my_rsvp || ''; // 'yes', 'maybe', 'no'
+        
+        div.innerHTML = `
+          <div class="event-card-header">
+            <h3 class="event-card-title">${evt.title}</h3>
+            <span class="event-card-badge">${evt.event_type}</span>
+          </div>
+          <div class="event-card-meta">
+            <span class="event-card-meta-item"><i class="bi bi-calendar"></i> ${new Date(evt.start_time).toLocaleDateString()}</span>
+            <span class="event-card-meta-item"><i class="bi bi-clock"></i> ${new Date(evt.start_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+            <span class="event-card-meta-item"><i class="bi bi-geo-alt"></i> ${evt.location || 'N/A'}</span>
+            <span class="event-card-meta-item"><i class="bi bi-people"></i> ${evt.attendee_count || 0} / ${evt.max_attendees} attendees</span>
+          </div>
+          <div class="event-card-desc">${evt.description || ''}</div>
+          ${isPast ? `
+            <div class="event-card-footer">
+              <span class="event-past">Past Event</span>
+            </div>
+          ` : `
+            <div class="event-card-footer">
+              <div>
+                <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">RSVP Status:</div>
+                <div class="rsvp-status">
+                  <button class="rsvp-option yes ${myRsvp === 'yes' ? 'yes' : ''}" style="${myRsvp === 'yes' ? 'background:rgba(76,209,119,0.2); font-weight:600;' : ''}" onclick="submitRSVP(${evt.id}, 'yes', this)">Yes</button>
+                  <button class="rsvp-option maybe ${myRsvp === 'maybe' ? 'maybe' : ''}" style="${myRsvp === 'maybe' ? 'background:rgba(255,168,0,0.2); font-weight:600;' : ''}" onclick="submitRSVP(${evt.id}, 'maybe', this)">Maybe</button>
+                  <button class="rsvp-option no ${myRsvp === 'no' ? 'no' : ''}" style="${myRsvp === 'no' ? 'background:rgba(255,107,107,0.2); font-weight:600;' : ''}" onclick="submitRSVP(${evt.id}, 'no', this)">No</button>
+                </div>
+              </div>
+            </div>
+          `}
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function filterEvents(type, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+
+      if (type === 'All') {
+        displayEvents(allEvents);
+      } else {
+        const filtered = allEvents.filter(e => e.event_type.toLowerCase() === type.toLowerCase());
+        displayEvents(filtered);
+      }
+    }
+
+    function submitRSVP(eventId, status, btn) {
+      fetch(`http://localhost:3000/api/events/${eventId}/rsvp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ status })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          const container = btn.parentElement;
+          container.querySelectorAll('.rsvp-option').forEach(b => {
+            b.style.background = 'transparent';
+            b.style.fontWeight = '500';
+          });
+          if (status === 'yes') {
+            btn.style.background = 'rgba(76,209,119,0.2)';
+          } else if (status === 'maybe') {
+            btn.style.background = 'rgba(255,168,0,0.2)';
+          } else if (status === 'no') {
+            btn.style.background = 'rgba(255,107,107,0.2)';
+          }
+          btn.style.fontWeight = '600';
+          loadEventsList();
+        } else {
+          alert(data.message);
+        }
+      })
+      .catch(err => console.error('RSVP failed:', err));
+    }
+
+    function loadPaymentsList() {
+      fetch(`http://localhost:3000/api/payments/my`, { credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            const tbody = document.getElementById('member-payments-body');
+            tbody.innerHTML = '';
+            if (data.payments.length === 0) {
+              tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No payments found</td></tr>';
+              return;
+            }
+            data.payments.forEach(pay => {
+              const tr = document.createElement('tr');
+              const paidDate = pay.paid_at ? new Date(pay.paid_at).toLocaleDateString() : '-';
+              const dueDate = pay.due_date ? new Date(pay.due_date).toLocaleDateString() : '-';
+              tr.innerHTML = `
+                <td style="font-weight: 600;">${pay.description || 'Membership Fee'}</td>
+                <td>${pay.currency} ${Number(pay.amount).toFixed(2)}</td>
+                <td><span class="badge badge-basic">${pay.payment_type}</span></td>
+                <td>${dueDate}</td>
+                <td>${paidDate}</td>
+                <td><span class="badge badge-${pay.status === 'paid' ? 'active' : 'inactive'}">${pay.status}</span></td>
+              `;
+              tbody.appendChild(tr);
+            });
+          }
+        });
+    }
+
+    function loadAnnouncements() {
+      if (!currentMemberProfile || !currentMemberProfile.org_id) return;
+      fetch(`http://localhost:3000/api/blog?org_id=${currentMemberProfile.org_id}&status=published`, { credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            const container = document.getElementById('blog-posts-container');
+            container.innerHTML = '';
+            if (data.posts.length === 0) {
+              container.innerHTML = '<p class="text-center text-muted">No announcements from your organization</p>';
+              return;
+            }
+            data.posts.forEach(post => {
+              const div = document.createElement('div');
+              div.style.padding = '20px';
+              div.style.border = '1px solid var(--border)';
+              div.style.borderRadius = 'var(--radius)';
+              div.style.marginBottom = '16px';
+              div.style.background = 'var(--bg-card-2)';
+              
+              div.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+                  <h4 style="margin:0; font-family:\'Playfair Display\', serif; font-size:1.1rem; color:var(--text-white);">${post.title}</h4>
+                  <span class="badge badge-${post.category.toLowerCase() === 'urgent' ? 'active' : 'basic'}">${post.category}</span>
+                </div>
+                <p style="font-size:0.9rem; color:var(--text-muted); line-height:1.5; margin-bottom:12px;">${post.content}</p>
+                <div style="font-size:0.75rem; color:var(--text-dim);">Posted by ${post.author_name} on ${new Date(post.created_at).toLocaleDateString()}</div>
+              `;
+              container.appendChild(div);
+            });
+          }
+        });
+    }
+
+    function submitProfileUpdate(e) {
+      e.preventDefault();
+      const first_name = document.getElementById('profile-first-name').value.trim();
+      const last_name = document.getElementById('profile-last-name').value.trim();
+      const phone = document.getElementById('profile-phone').value.trim();
+      const address = document.getElementById('profile-address').value.trim();
+      const city = document.getElementById('profile-city').value.trim();
+      const state = document.getElementById('profile-state').value.trim();
+      const zip_code = document.getElementById('profile-zip').value.trim();
+      const date_of_birth = document.getElementById('profile-dob').value;
+      const emergency_name = document.getElementById('profile-emergency-name').value.trim();
+      const emergency_phone = document.getElementById('profile-emergency-phone').value.trim();
+
+      fetch('http://localhost:3000/api/members/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          first_name, last_name, phone, address, city, state, zip_code, date_of_birth, emergency_name, emergency_phone
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert('Profile updated successfully!');
+          loadProfile();
+        } else {
+          alert(data.message);
+        }
+      })
+      .catch(err => {
+        console.error('Failed to update profile:', err);
+        alert('Server error updating profile');
+      });
+    }
+
+    function toggleUserDropdown() {
+      document.getElementById('userDropdown').classList.toggle('show');
+    }
+
+    function closeUserDropdown() {
+      document.getElementById('userDropdown').classList.remove('show');
+    }
+
+    document.addEventListener('click', function(event) {
+      const dropdown = document.getElementById('userDropdown');
+      const dropdownWrapper = document.querySelector('.user-dropdown-wrapper');
+      if (dropdown && dropdownWrapper && !dropdownWrapper.contains(event.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+
+    function handleLogout() {
+      fetch('http://localhost:3000/api/auth/logout', { method: 'POST', credentials: 'include' })
+        .then(() => {
+          window.location.href = 'login.html';
+        })
+        .catch(() => {
+          window.location.href = 'login.html';
+        });
+    }
+  </script>
+
+</body>
+</html>
