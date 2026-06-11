@@ -17,13 +17,23 @@ app.use(express.json());                    // parse JSON request bodies
 app.use(express.urlencoded({ extended: true })); // parse form data
 
 // CORS — allow frontend to talk to backend
-const allowedOrigins = ['http://localhost:3000', 'null'];
+// In production on Render, set FRONTEND_URL env var to your actual frontend URL.
+// Falls back to allowing all origins so the hosted site works out of the box.
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  process.env.FRONTEND_URL,               // e.g. https://your-app.onrender.com
+].filter(Boolean);
+
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    // Allow requests with no origin (mobile apps, curl, Postman)
+    // OR origins that are in our allowedOrigins list
+    // OR in production allow all if FRONTEND_URL is not set
+    if (!origin || allowedOrigins.includes(origin) || allowedOrigins.length === 2) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS')); 
+      callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true                        // allow cookies/session
@@ -35,7 +45,8 @@ app.use(session({
   resave:            false,
   saveUninitialized: false,
   cookie: {
-    secure:   false,                       // set to true if using HTTPS
+    secure:   process.env.NODE_ENV === 'production', // true on Render (HTTPS), false locally
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // required for cross-site cookies
     maxAge:   24 * 60 * 60 * 1000         // session lasts 24 hours
   }
 }));
