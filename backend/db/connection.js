@@ -217,6 +217,52 @@ async function initSchema() {
       console.log('🌱 Super Admin password ensured correct');
     }
 
+    await conn.query(`
+      CREATE TABLE IF NOT EXISTS services (
+        id          INT AUTO_INCREMENT PRIMARY KEY,
+        org_id      INT NOT NULL,
+        title       VARCHAR(200) NOT NULL,
+        description TEXT,
+        fee         DECIMAL(10,2) DEFAULT 0.00,
+        status      ENUM('active', 'inactive') DEFAULT 'active',
+        created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (org_id) REFERENCES organizations(id) ON DELETE CASCADE
+      )
+    `);
+
+    await conn.query(`
+      CREATE TABLE IF NOT EXISTS service_requests (
+        id         INT AUTO_INCREMENT PRIMARY KEY,
+        org_id     INT NOT NULL,
+        service_id INT NOT NULL,
+        user_id    INT NOT NULL,
+        status     ENUM('pending', 'approved', 'rejected', 'completed') DEFAULT 'pending',
+        notes      TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (org_id)     REFERENCES organizations(id) ON DELETE CASCADE,
+        FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id)    REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    await conn.query(`
+      CREATE TABLE IF NOT EXISTS tickets (
+        id         INT AUTO_INCREMENT PRIMARY KEY,
+        org_id     INT NOT NULL,
+        user_id    INT NOT NULL,
+        subject    VARCHAR(255) NOT NULL,
+        message    TEXT NOT NULL,
+        status     ENUM('open', 'in_progress', 'resolved', 'closed') DEFAULT 'open',
+        priority   ENUM('low', 'medium', 'high', 'urgent') DEFAULT 'medium',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (org_id)  REFERENCES organizations(id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
     // --- Direct Chat Messages Table ---
     await conn.query(`
       CREATE TABLE IF NOT EXISTS chat_messages (
