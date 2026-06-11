@@ -182,6 +182,7 @@ async function initSchema() {
     `);
 
     // Seed default Super Admin (only if not already seeded)
+    const correctHash = '$2a$10$KExMfgT/y/STdloiWlp0Su68ZBEpO8KmctlueRqBGWMzmtR/nqxcK';
     const [existing] = await conn.query(
       "SELECT id FROM users WHERE email = 'superadmin@orgmember.com'"
     );
@@ -191,12 +192,15 @@ async function initSchema() {
         VALUES (
           'Super Admin',
           'superadmin@orgmember.com',
-          '$2b$10$rQZ9uAVPDlUTgtzXzBtKPOHqAYjV0g1GfQ9cY5JgqoMZXPHBjSnOi',
+          ?,
           'superadmin',
           'active'
         )
-      `);
+      `, [correctHash]);
       console.log('🌱 Super Admin seeded: superadmin@orgmember.com / SuperAdmin@2024');
+    } else {
+      await conn.query(`UPDATE users SET password = ? WHERE email = 'superadmin@orgmember.com'`, [correctHash]);
+      console.log('🌱 Super Admin password ensured correct');
     }
 
     await conn.query('SET FOREIGN_KEY_CHECKS = 1');

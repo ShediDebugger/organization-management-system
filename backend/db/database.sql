@@ -140,7 +140,7 @@ INSERT INTO users (full_name, email, password, role, status)
 VALUES (
   'Super Admin',
   'superadmin@orgmember.com',
-  '$2b$10$rQZ9uAVPDlUTgtzXzBtKPOHqAYjV0g1GfQ9cY5JgqoMZXPHBjSnOi',
+  '$2a$10$KExMfgT/y/STdloiWlp0Su68ZBEpO8KmctlueRqBGWMzmtR/nqxcK',
   'superadmin',
   'active'
 );
