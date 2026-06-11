@@ -66,6 +66,7 @@ app.use('/api/organizations', require('./routes/organizations'));
 app.use('/api/services',      require('./routes/services'));
 app.use('/api/tickets',       require('./routes/tickets'));
 app.use('/api/idcard',        require('./routes/idcard'));
+app.use('/api/chat',          require('./routes/chat'));
 
 // ── Health Check ──
 app.get('/api/health', (req, res) => {

@@ -978,6 +978,13 @@
             <span>My ID Card</span>
           </div>
         </li>
+        <li class="menu-item">
+          <div class="menu-link" onclick="switchTab('chat')">
+            <i class="bi bi-chat-dots menu-icon"></i>
+            <span>Messages</span>
+            <span id="chatUnreadBadge" style="display:none;background:#f5a623;color:#0b1628;font-size:0.6rem;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:auto;"></span>
+          </div>
+        </li>
       </ul>
 
       <div class="sidebar-footer">
@@ -1297,6 +1304,7 @@
                   <th>Due Date</th>
                   <th>Paid Date</th>
                   <th>Status</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody id="member-payments-body">
@@ -1423,10 +1431,100 @@
           </p>
         </div>
       </div>
+      <!-- ═══════════════════════════ CHAT TAB ═══════════════════════════ -->
+      <div id="chat-tab" class="tab-content">
+        <div style="display:grid;grid-template-columns:280px 1fr;gap:0;height:600px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
+          
+          <!-- LEFT: Contacts Sidebar -->
+          <div style="border-right:1px solid var(--border);display:flex;flex-direction:column;">
+            <div style="padding:20px 16px;border-bottom:1px solid var(--border);">
+              <h3 style="margin:0;font-size:1rem;font-weight:700;font-family:'Playfair Display',serif;">Messages</h3>
+            </div>
+            <div id="chatContactsList" style="flex:1;overflow-y:auto;padding:8px 0;">
+              <div style="text-align:center;color:var(--text-dim);padding:40px 16px;font-size:0.85rem;">Loading contacts...</div>
+            </div>
+          </div>
+
+          <!-- RIGHT: Chat Window -->
+          <div style="display:flex;flex-direction:column;background:var(--bg-dark);">
+            <!-- Chat header -->
+            <div id="chatWindowHeader" style="padding:16px 20px;border-bottom:1px solid var(--border);background:var(--bg-card);display:flex;align-items:center;gap:12px;min-height:65px;">
+              <div id="chatHeaderAvatar" style="width:38px;height:38px;background:linear-gradient(135deg,#f5a623,#e09520);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#0b1628;font-size:0.9rem;flex-shrink:0;display:none;"></div>
+              <div>
+                <div id="chatHeaderName" style="font-weight:600;color:var(--text-white);font-size:0.95rem;"></div>
+                <div id="chatHeaderRole" style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;"></div>
+              </div>
+              <div id="chatHeaderEmpty" style="color:var(--text-dim);font-size:0.85rem;">Select a contact to start chatting</div>
+            </div>
+
+            <!-- Messages area -->
+            <div id="chatMessagesArea" style="flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:10px;">
+              <div id="chatEmptyState" style="margin:auto;text-align:center;color:var(--text-dim);">
+                <i class="bi bi-chat-dots" style="font-size:3rem;display:block;margin-bottom:12px;opacity:0.3;"></i>
+                <p style="font-size:0.85rem;">Select a contact to view messages</p>
+              </div>
+            </div>
+
+            <!-- Input Area -->
+            <div id="chatInputArea" style="padding:16px;border-top:1px solid var(--border);background:var(--bg-card);display:none;">
+              <form id="chatSendForm" onsubmit="sendChatMessage(event)" style="display:flex;gap:10px;">
+                <input type="hidden" id="chatReceiverId" />
+                <input type="text" id="chatMessageInput" 
+                  placeholder="Type a message..." 
+                  autocomplete="off"
+                  style="flex:1;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px 14px;border-radius:24px;font-family:Inter,sans-serif;font-size:0.9rem;outline:none;transition:border-color 0.2s;"
+                  onfocus="this.style.borderColor='var(--accent)'"
+                  onblur="this.style.borderColor='var(--border)'"
+                />
+                <button type="submit" style="background:var(--accent);border:none;color:#0b1628;width:42px;height:42px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;transition:background 0.2s;flex-shrink:0;"
+                  onmouseover="this.style.background='var(--accent-hover)'" onmouseout="this.style.background='var(--accent)'">
+                  <i class="bi bi-send-fill"></i>
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
 
     </main>
 
     <!-- ═══ MODALS ═══ -->
+    <div class="modal-overlay" id="checkoutModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;align-items:center;justify-content:center;">
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;width:100%;max-width:500px;text-align:center;">
+        <h3 style="margin-top:0;font-family:'Playfair Display',serif;font-size:1.5rem;">Secure Checkout</h3>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:24px;">Select your preferred payment method</p>
+
+        <div style="font-size:1.8rem;font-weight:700;color:var(--text-white);margin-bottom:8px;" id="checkoutAmountDisplay">$0.00</div>
+        <div style="color:var(--text-dim);font-size:0.85rem;margin-bottom:24px;" id="checkoutDescDisplay">Invoice</div>
+
+        <input type="hidden" id="checkoutPaymentId" />
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;">
+          <button onclick="processCheckout('stripe')" style="background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:16px;border-radius:var(--radius);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:all 0.2s;" onmouseover="this.style.borderColor='#6366f1';this.style.background='rgba(99,102,241,0.1)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--bg-dark)'">
+            <i class="bi bi-credit-card-fill" style="font-size:1.5rem;color:#6366f1;"></i>
+            <span style="font-weight:600;font-size:0.85rem;">Card / Stripe</span>
+          </button>
+          
+          <button onclick="processCheckout('paypal')" style="background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:16px;border-radius:var(--radius);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:all 0.2s;" onmouseover="this.style.borderColor='#0079c1';this.style.background='rgba(0,121,193,0.1)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--bg-dark)'">
+            <i class="bi bi-paypal" style="font-size:1.5rem;color:#0079c1;"></i>
+            <span style="font-weight:600;font-size:0.85rem;">PayPal</span>
+          </button>
+          
+          <button onclick="processCheckout('telebirr')" style="background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:16px;border-radius:var(--radius);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:all 0.2s;" onmouseover="this.style.borderColor='#25d366';this.style.background='rgba(37,211,102,0.1)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--bg-dark)'">
+            <i class="bi bi-phone-fill" style="font-size:1.5rem;color:#25d366;"></i>
+            <span style="font-weight:600;font-size:0.85rem;">Telebirr</span>
+          </button>
+
+          <button onclick="processCheckout('cbe')" style="background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:16px;border-radius:var(--radius);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:all 0.2s;" onmouseover="this.style.borderColor='#a855f7';this.style.background='rgba(168,85,247,0.1)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--bg-dark)'">
+            <i class="bi bi-bank2" style="font-size:1.5rem;color:#a855f7;"></i>
+            <span style="font-weight:600;font-size:0.85rem;">CBE Birr</span>
+          </button>
+        </div>
+
+        <button onclick="closeModal('checkoutModal')" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:10px 24px;border-radius:var(--radius);cursor:pointer;font-family:Inter,sans-serif;">Cancel</button>
+      </div>
+    </div>
+
     <div class="modal-overlay" id="createTicketModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;align-items:center;justify-content:center;">
       <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;width:100%;max-width:500px;">
         <h3 style="margin-top:0;font-family:'Playfair Display',serif;font-size:1.5rem;">Create Support Ticket</h3>
@@ -1880,13 +1978,19 @@
               const tr = document.createElement('tr');
               const paidDate = pay.paid_at ? new Date(pay.paid_at).toLocaleDateString() : '-';
               const dueDate = pay.due_date ? new Date(pay.due_date).toLocaleDateString() : '-';
+              const isPaid = pay.status === 'paid';
+              const actionHtml = isPaid 
+                ? `<span style="color:var(--success);font-size:0.85rem;"><i class="bi bi-check-circle-fill me-1"></i>Settled</span>`
+                : `<button class="btn-primary" style="padding:4px 12px;font-size:0.75rem;" onclick="openCheckout(${pay.id}, ${pay.amount}, '${pay.currency}', '${(pay.description||'').replace(/'/g, "\\'")}')">Pay Now</button>`;
+              
               tr.innerHTML = `
                 <td style="font-weight: 600;">${pay.description || 'Membership Fee'}</td>
                 <td>${pay.currency} ${Number(pay.amount).toFixed(2)}</td>
                 <td><span class="badge badge-basic">${pay.payment_type}</span></td>
                 <td>${dueDate}</td>
                 <td>${paidDate}</td>
-                <td><span class="badge badge-${pay.status === 'paid' ? 'active' : 'inactive'}">${pay.status}</span></td>
+                <td><span class="badge badge-${isPaid ? 'active' : 'inactive'}">${pay.status}</span></td>
+                <td>${actionHtml}</td>
               `;
               tbody.appendChild(tr);
             });
@@ -2206,17 +2310,167 @@
   const originalSwitchTabMember2 = window.switchTab;
   window.switchTab = function(tabId) {
     if (originalSwitchTabMember2) originalSwitchTabMember2(tabId);
-    if (tabId === 'helpdesk') {
-      fetchTickets();
-    }
-    if (tabId === 'idcard') {
-      loadIdCard();
-    }
+    if (tabId === 'helpdesk') fetchTickets();
+    if (tabId === 'idcard')   loadIdCard();
+    if (tabId === 'chat')     initChat();
   };
 
   // ══════════════════════════════════════════
-  // DIGITAL ID CARD LOGIC
+  // DIRECT CHAT LOGIC
   // ══════════════════════════════════════════
+  let currentChatReceiverId = null;
+  let chatPollInterval = null;
+
+  async function initChat() {
+    await loadChatContacts();
+    checkUnreadCount();
+  }
+
+  async function loadChatContacts() {
+    try {
+      const res = await fetch('/api/chat/contacts');
+      const data = await res.json();
+      const list = document.getElementById('chatContactsList');
+      if (data.success && data.contacts.length > 0) {
+        list.innerHTML = data.contacts.map(c => {
+          const initials = c.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+          const lastMsg = c.last_message ? (c.last_message.length > 30 ? c.last_message.slice(0, 30) + '...' : c.last_message) : 'No messages yet';
+          const unreadDot = c.unread_count > 0 ? `<span style="background:#f5a623;color:#0b1628;font-size:0.6rem;font-weight:700;padding:1px 5px;border-radius:10px;">${c.unread_count}</span>` : '';
+          return `
+            <div onclick="openChatWith(${c.id}, '${c.full_name.replace(/'/g, "\\'")}', '${c.role_in_org || ''}')" 
+                 id="contact-${c.id}"
+                 style="padding:12px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:background 0.15s;border-bottom:1px solid rgba(255,255,255,0.04);"
+                 onmouseover="this.style.background='rgba(255,255,255,0.04)'"
+                 onmouseout="this.style.background='transparent'">
+              <div style="width:40px;height:40px;background:linear-gradient(135deg,#f5a623,#e09520);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#0b1628;font-size:0.85rem;flex-shrink:0;">${initials}</div>
+              <div style="flex:1;min-width:0;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+                  <span style="font-weight:600;font-size:0.88rem;color:var(--text-white);">${c.full_name}</span>
+                  ${unreadDot}
+                </div>
+                <div style="font-size:0.75rem;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${lastMsg}</div>
+              </div>
+            </div>`;
+        }).join('');
+      } else {
+        list.innerHTML = '<div style="text-align:center;color:var(--text-dim);padding:40px 16px;font-size:0.85rem;">No contacts found.</div>';
+      }
+    } catch (e) {
+      console.error('Load contacts error:', e);
+    }
+  }
+
+  async function openChatWith(userId, name, role) {
+    currentChatReceiverId = userId;
+
+    // Highlight selected contact
+    document.querySelectorAll('[id^="contact-"]').forEach(el => el.style.background = 'transparent');
+    const selected = document.getElementById(`contact-${userId}`);
+    if (selected) selected.style.background = 'rgba(245,166,35,0.08)';
+
+    // Update header
+    const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    const avatar = document.getElementById('chatHeaderAvatar');
+    avatar.textContent = initials;
+    avatar.style.display = 'flex';
+    document.getElementById('chatHeaderName').textContent = name;
+    document.getElementById('chatHeaderRole').textContent = role || 'Member';
+    document.getElementById('chatHeaderEmpty').style.display = 'none';
+
+    // Show input
+    document.getElementById('chatInputArea').style.display = 'block';
+    document.getElementById('chatReceiverId').value = userId;
+
+    // Load messages
+    await loadMessages(userId);
+
+    // Start polling every 4 seconds
+    if (chatPollInterval) clearInterval(chatPollInterval);
+    chatPollInterval = setInterval(() => loadMessages(currentChatReceiverId, true), 4000);
+  }
+
+  async function loadMessages(receiverId, silent = false) {
+    try {
+      const res = await fetch(`/api/chat/messages/${receiverId}`);
+      const data = await res.json();
+      if (!data.success) return;
+
+      const area = document.getElementById('chatMessagesArea');
+      const wasAtBottom = area.scrollHeight - area.clientHeight <= area.scrollTop + 50;
+
+      // Render messages
+      const meId = currentMemberProfile?.id;
+      area.innerHTML = data.messages.map(m => {
+        const isMe = m.sender_id === meId;
+        const time = new Date(m.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        return `
+          <div style="display:flex;justify-content:${isMe ? 'flex-end' : 'flex-start'};">
+            <div style="
+              max-width: 70%;
+              background: ${isMe ? 'linear-gradient(135deg,#f5a623,#e09520)' : 'var(--bg-card)'};
+              color: ${isMe ? '#0b1628' : 'var(--text-white)'};
+              padding: 10px 14px;
+              border-radius: ${isMe ? '18px 18px 4px 18px' : '18px 18px 18px 4px'};
+              border: 1px solid ${isMe ? 'transparent' : 'var(--border)'};
+              font-size: 0.88rem;
+              line-height: 1.5;
+            ">
+              <div>${m.message.replace(/\n/g, '<br>')}</div>
+              <div style="font-size:0.65rem;opacity:0.7;margin-top:4px;text-align:right;">${time}</div>
+            </div>
+          </div>`;
+      }).join('');
+
+      if (!silent || wasAtBottom) {
+        area.scrollTop = area.scrollHeight;
+      }
+
+      // Refresh contacts to update unread counts
+      if (!silent) loadChatContacts();
+    } catch (e) {
+      console.error('Load messages error:', e);
+    }
+  }
+
+  async function sendChatMessage(e) {
+    e.preventDefault();
+    const input = document.getElementById('chatMessageInput');
+    const message = input.value.trim();
+    if (!message || !currentChatReceiverId) return;
+
+    input.value = '';
+
+    try {
+      await fetch('/api/chat/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ receiver_id: currentChatReceiverId, message })
+      });
+      await loadMessages(currentChatReceiverId);
+      loadChatContacts();
+    } catch (e) {
+      console.error('Send error:', e);
+    }
+  }
+
+  async function checkUnreadCount() {
+    try {
+      const res = await fetch('/api/chat/unread');
+      const data = await res.json();
+      const badge = document.getElementById('chatUnreadBadge');
+      if (data.success && data.count > 0) {
+        badge.textContent = data.count;
+        badge.style.display = 'inline';
+      } else {
+        badge.style.display = 'none';
+      }
+    } catch (e) {}
+  }
+
+  // Poll unread count every 30 seconds
+  setInterval(checkUnreadCount, 30000);
+
+  </script>
   let idCardData = null;
 
   async function loadIdCard() {
@@ -2323,6 +2577,69 @@
       printWindow.focus();
       printWindow.print();
     }, 500);
+  }
+
+  // ══════════════════════════════════════════
+  // PAYMENT GATEWAY SIMULATION LOGIC
+  // ══════════════════════════════════════════
+  function openCheckout(paymentId, amount, currency, desc) {
+    document.getElementById('checkoutPaymentId').value = paymentId;
+    document.getElementById('checkoutAmountDisplay').textContent = `${currency} ${Number(amount).toFixed(2)}`;
+    document.getElementById('checkoutDescDisplay').textContent = desc || 'Payment';
+    openModal('checkoutModal');
+  }
+
+  async function processCheckout(method) {
+    const paymentId = document.getElementById('checkoutPaymentId').value;
+    
+    // Simulate loading
+    const modalBtn = event.currentTarget;
+    const originalHtml = modalBtn.innerHTML;
+    modalBtn.innerHTML = '<i class="bi bi-hourglass-split" style="font-size:1.5rem;color:var(--text-white);"></i><span style="font-weight:600;font-size:0.85rem;">Processing...</span>';
+    modalBtn.style.pointerEvents = 'none';
+
+    try {
+      // 1. Initialize checkout (get intent/token)
+      const res1 = await fetch(`/api/payments/checkout/${paymentId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ method })
+      });
+      const data1 = await res1.json();
+      
+      if (!data1.success) {
+        alert(data1.message);
+        modalBtn.innerHTML = originalHtml;
+        modalBtn.style.pointerEvents = 'auto';
+        return;
+      }
+
+      // Simulate a network delay (redirect to gateway & back)
+      await new Promise(r => setTimeout(r, 1500));
+
+      // 2. Confirm payment success
+      const res2 = await fetch(`/api/payments/confirm/${paymentId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transaction_id: data1.clientSecret })
+      });
+      const data2 = await res2.json();
+
+      if (data2.success) {
+        alert('Payment successful! Thank you.');
+        closeModal('checkoutModal');
+        // Reload dashboard to reflect payment
+        window.location.reload();
+      } else {
+        alert(data2.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('An error occurred during checkout');
+    } finally {
+      modalBtn.innerHTML = originalHtml;
+      modalBtn.style.pointerEvents = 'auto';
+    }
   }
 
   </script>

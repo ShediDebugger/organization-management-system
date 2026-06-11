@@ -154,4 +154,55 @@ router.put('/:id', isOrgAdmin, async (req, res) => {
   }
 });
 
+// ══════════════════════════════════════════
+// POST /api/payments/checkout/:id
+// Initialize checkout (Dummy payment gateway)
+// ══════════════════════════════════════════
+router.post('/checkout/:id', isLoggedIn, async (req, res) => {
+  const userId = req.session.user.id;
+  const paymentId = req.params.id;
+  const { method } = req.body;
+
+  try {
+    const [payments] = await db.query('SELECT * FROM payments WHERE id = ? AND user_id = ? AND status != "paid"', [paymentId, userId]);
+    if (payments.length === 0) return res.status(404).json({ success: false, message: 'Payment not found or already paid' });
+    
+    // Simulate payment token generation
+    const transactionToken = `txn_${method}_${Date.now()}_${Math.floor(Math.random()*1000)}`;
+    
+    res.json({ 
+      success: true, 
+      clientSecret: transactionToken, 
+      paymentDetails: payments[0]
+    });
+  } catch (error) {
+    console.error('Checkout error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// ══════════════════════════════════════════
+// POST /api/payments/confirm/:id
+// Confirm payment success
+// ══════════════════════════════════════════
+router.post('/confirm/:id', isLoggedIn, async (req, res) => {
+  const userId = req.session.user.id;
+  const paymentId = req.params.id;
+
+  try {
+    const [payments] = await db.query('SELECT * FROM payments WHERE id = ? AND user_id = ?', [paymentId, userId]);
+    if (payments.length === 0) return res.status(404).json({ success: false, message: 'Payment not found' });
+    
+    await db.query(
+      'UPDATE payments SET status = "paid", paid_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [paymentId]
+    );
+
+    res.json({ success: true, message: 'Payment processed successfully!' });
+  } catch (error) {
+    console.error('Confirm error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
 module.exports = router;
