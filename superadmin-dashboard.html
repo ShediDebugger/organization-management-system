@@ -1108,7 +1108,7 @@
     });
 
     function checkAuth() {
-      fetch('http://localhost:3000/api/auth/me', { credentials: 'include' })
+      fetch('/api/auth/me', { credentials: 'include' })
         .then(res => {
           if (res.status === 401) {
             window.location.href = 'login.html';
@@ -1160,7 +1160,7 @@
     }
 
     function loadStats() {
-      fetch('http://localhost:3000/api/superadmin/stats', { credentials: 'include' })
+      fetch('/api/superadmin/stats', { credentials: 'include' })
         .then(res => res.json())
         .then(data => {
           if (data.success) {
@@ -1220,7 +1220,7 @@
     }
 
     function loadOrganizations() {
-      fetch('http://localhost:3000/api/organizations', { credentials: 'include' })
+      fetch('/api/organizations', { credentials: 'include' })
         .then(res => res.json())
         .then(data => {
           if (data.success) {
@@ -1266,7 +1266,7 @@
       const admin_email = document.getElementById('new-org-admin-email').value.trim();
       const admin_password = document.getElementById('new-org-admin-password').value;
 
-      fetch('http://localhost:3000/api/organizations', {
+      fetch('/api/organizations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -1314,7 +1314,7 @@
       const members_limit = document.getElementById('edit-org-limit').value;
       const status = document.getElementById('edit-org-status').value;
 
-      fetch(`http://localhost:3000/api/organizations/${id}`, {
+      fetch(`/api/organizations/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -1338,7 +1338,7 @@
       if (!confirm('Are you sure you want to delete this organization? All members, events, and records will be deleted.')) {
         return;
       }
-      fetch(`http://localhost:3000/api/organizations/${id}`, {
+      fetch(`/api/organizations/${id}`, {
         method: 'DELETE',
         credentials: 'include'
       })
@@ -1355,7 +1355,7 @@
     }
 
     function loadAdmins() {
-      fetch('http://localhost:3000/api/superadmin/admins', { credentials: 'include' })
+      fetch('/api/superadmin/admins', { credentials: 'include' })
         .then(res => res.json())
         .then(data => {
           if (data.success) {
@@ -1387,7 +1387,7 @@
     }
 
     function loadMembers() {
-      fetch('http://localhost:3000/api/superadmin/members', { credentials: 'include' })
+      fetch('/api/superadmin/members', { credentials: 'include' })
         .then(res => res.json())
         .then(data => {
           if (data.success) {
@@ -1419,7 +1419,7 @@
     }
 
     function loadPayments() {
-      fetch('http://localhost:3000/api/superadmin/payments', { credentials: 'include' })
+      fetch('/api/superadmin/payments', { credentials: 'include' })
         .then(res => res.json())
         .then(data => {
           if (data.success) {
@@ -1529,7 +1529,7 @@
     });
 
     function handleLogout() {
-      fetch('http://localhost:3000/api/auth/logout', { method: 'POST', credentials: 'include' })
+      fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
         .then(() => {
           window.location.href = 'login.html';
         })

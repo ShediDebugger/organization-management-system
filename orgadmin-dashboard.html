@@ -1569,7 +1569,7 @@
 
   // ── When page loads, get logged in user info ──
   window.addEventListener('load', function () {
-    fetch('http://localhost:3000/api/auth/me', {
+    fetch('/api/auth/me', {
       credentials: 'include'
     })
     .then(res => res.json())
@@ -1587,7 +1587,7 @@
       document.getElementById('dropdownName').textContent  = currentUser.full_name;
 
       // Get org ID for this admin
-      fetch(`http://localhost:3000/api/organizations/mine`, {
+      fetch(`/api/organizations/mine`, {
         credentials: 'include'
       })
       .then(res => res.json())
@@ -1619,7 +1619,7 @@
   function loadDashboard() {
     loadMonthlyIncome();
     // Load member count
-    fetch(`http://localhost:3000/api/members?org_id=${currentOrgId}&limit=1`, {
+    fetch(`/api/members?org_id=${currentOrgId}&limit=1`, {
       credentials: 'include'
     })
     .then(res => res.json())
@@ -1630,7 +1630,7 @@
     });
 
     // Load events count
-    fetch(`http://localhost:3000/api/events?org_id=${currentOrgId}&limit=1`, {
+    fetch(`/api/events?org_id=${currentOrgId}&limit=1`, {
       credentials: 'include'
     })
     .then(res => res.json())
@@ -1665,7 +1665,7 @@
 
   function loadMembers(page = 1, search = '') {
     currentPage = page;
-    fetch(`http://localhost:3000/api/members?org_id=${currentOrgId}&page=${page}&search=${search}`, {
+    fetch(`/api/members?org_id=${currentOrgId}&page=${page}&search=${search}`, {
       credentials: 'include'
     })
     .then(res => res.json())
@@ -1737,7 +1737,7 @@
     const select = document.getElementById('paymentMember');
     if (!select) return;
 
-    fetch(`http://localhost:3000/api/members?org_id=${currentOrgId}&limit=1000`, {
+    fetch(`/api/members?org_id=${currentOrgId}&limit=1000`, {
       credentials: 'include'
     })
     .then(res => res.json())
@@ -1776,7 +1776,7 @@
       return;
     }
 
-    fetch('http://localhost:3000/api/members', {
+    fetch('/api/members', {
       method:      'POST',
       headers:     { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -1800,7 +1800,7 @@
   function deleteMember(userId) {
     if (!confirm('Are you sure you want to remove this member?')) return;
 
-    fetch(`http://localhost:3000/api/members/${userId}`, {
+    fetch(`/api/members/${userId}`, {
       method:      'DELETE',
       headers:     { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -1822,7 +1822,7 @@
   // EVENTS
   // ══════════════════════════════════════════
   function loadEvents() {
-    fetch(`http://localhost:3000/api/events?org_id=${currentOrgId}`, {
+    fetch(`/api/events?org_id=${currentOrgId}`, {
       credentials: 'include'
     })
     .then(res => res.json())
@@ -1873,7 +1873,7 @@
     const payload = { org_id: currentOrgId, title, event_type, location, start_time, end_time, max_attendees, description };
     console.log('Creating event, payload:', payload);
 
-    fetch('http://localhost:3000/api/events', {
+    fetch('/api/events', {
       method:      'POST',
       headers:     { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -1908,7 +1908,7 @@
 
   function deleteEvent(id) {
     if (!confirm('Delete this event?')) return;
-    fetch(`http://localhost:3000/api/events/${id}`, {
+    fetch(`/api/events/${id}`, {
       method: 'DELETE', credentials: 'include'
     })
     .then(res => res.json())
@@ -1921,7 +1921,7 @@
   // PAYMENTS
   // ══════════════════════════════════════════
   function loadPayments() {
-    fetch(`http://localhost:3000/api/payments?org_id=${currentOrgId}`, {
+    fetch(`/api/payments?org_id=${currentOrgId}`, {
       credentials: 'include'
     })
     .then(res => res.json())
@@ -1963,7 +1963,7 @@
       return;
     }
 
-    fetch('http://localhost:3000/api/payments', {
+    fetch('/api/payments', {
       method:      'POST',
       headers:     { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -1982,7 +1982,7 @@
   }
 
   function markPaid(id) {
-    fetch(`http://localhost:3000/api/payments/${id}`, {
+    fetch(`/api/payments/${id}`, {
       method:      'PUT',
       headers:     { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -2062,7 +2062,7 @@
   // BLOG FUNCTIONS
   // ══════════════════════════════════════════
   function loadBlog() {
-    fetch(`http://localhost:3000/api/blog?org_id=${currentOrgId}`, {
+    fetch(`/api/blog?org_id=${currentOrgId}`, {
       credentials: 'include'
     })
     .then(res => res.json())
@@ -2110,7 +2110,7 @@
 
     if (!title || !content) { alert('Title and content are required!'); return; }
 
-    fetch('http://localhost:3000/api/blog', {
+    fetch('/api/blog', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -2137,7 +2137,7 @@
 
   function deletePost(id) {
     if (!confirm('Delete this post?')) return;
-    fetch(`http://localhost:3000/api/blog/${id}`, {
+    fetch(`/api/blog/${id}`, {
       method: 'DELETE', credentials: 'include'
     })
     .then(res => res.json())
@@ -2157,7 +2157,7 @@
 
   function togglePublish(id, currentStatus, currentTitle, currentContent, currentCategory) {
     const newStatus = currentStatus === 'draft' ? 'published' : 'draft';
-    fetch(`http://localhost:3000/api/blog/${id}`, {
+    fetch(`/api/blog/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -2199,7 +2199,7 @@
 
     if (!full_name) { alert('Name is required!'); return; }
 
-    fetch(`http://localhost:3000/api/members/${id}`, {
+    fetch(`/api/members/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -2220,7 +2220,7 @@
   // ══════════════════════════════════════════
   function loadReports() {
     // Load member count
-    fetch(`http://localhost:3000/api/members?org_id=${currentOrgId}&limit=1`, { credentials: 'include' })
+    fetch(`/api/members?org_id=${currentOrgId}&limit=1`, { credentials: 'include' })
     .then(res => res.json())
     .then(data => {
       if (data.success) {
@@ -2229,7 +2229,7 @@
     });
 
     // Load events count
-    fetch(`http://localhost:3000/api/events?org_id=${currentOrgId}&limit=1`, { credentials: 'include' })
+    fetch(`/api/events?org_id=${currentOrgId}&limit=1`, { credentials: 'include' })
     .then(res => res.json())
     .then(data => {
       if (data.success) {
@@ -2238,7 +2238,7 @@
     });
 
     // Load payments
-    fetch(`http://localhost:3000/api/payments?org_id=${currentOrgId}`, { credentials: 'include' })
+    fetch(`/api/payments?org_id=${currentOrgId}`, { credentials: 'include' })
     .then(res => res.json())
     .then(data => {
       if (data.success) {
@@ -2259,7 +2259,7 @@
     });
 
     // Load members for activity log
-    fetch(`http://localhost:3000/api/members?org_id=${currentOrgId}`, { credentials: 'include' })
+    fetch(`/api/members?org_id=${currentOrgId}`, { credentials: 'include' })
     .then(res => res.json())
     .then(data => {
       if (data.success) {
@@ -2277,7 +2277,7 @@
     });
 
     // Load blog count
-    fetch(`http://localhost:3000/api/blog?org_id=${currentOrgId}`, { credentials: 'include' })
+    fetch(`/api/blog?org_id=${currentOrgId}`, { credentials: 'include' })
     .then(res => res.json())
     .then(data => {
       if (data.success) {
@@ -2293,7 +2293,7 @@
     if (!from || !to) { alert('Please select date range'); return; }
 
     // Filter the payment table rows by date range
-    fetch(`http://localhost:3000/api/payments?org_id=${currentOrgId}`, { credentials: 'include' })
+    fetch(`/api/payments?org_id=${currentOrgId}`, { credentials: 'include' })
     .then(res => res.json())
     .then(data => {
       if (!data.success) return;
@@ -2327,7 +2327,7 @@
   }
 
   function exportCSV() {
-    fetch(`http://localhost:3000/api/members?org_id=${currentOrgId}&limit=1000`, { credentials: 'include' })
+    fetch(`/api/members?org_id=${currentOrgId}&limit=1000`, { credentials: 'include' })
     .then(res => res.json())
     .then(data => {
       if (!data.success) return;
@@ -2345,7 +2345,7 @@
 
   // ── Load Monthly Income ──
   function loadMonthlyIncome() {
-    fetch(`http://localhost:3000/api/payments?org_id=${currentOrgId}`, { credentials: 'include' })
+    fetch(`/api/payments?org_id=${currentOrgId}`, { credentials: 'include' })
     .then(res => res.json())
     .then(data => {
       if (data.success) {
@@ -2366,7 +2366,7 @@
       document.getElementById('settingAdminEmail').value = currentUser.email || '';
     }
     // Pre-fill org info
-    fetch('http://localhost:3000/api/organizations/mine', { credentials: 'include' })
+    fetch('/api/organizations/mine', { credentials: 'include' })
     .then(res => res.json())
     .then(data => {
       if (data.success) {
@@ -2386,7 +2386,7 @@
 
     if (!name) { showSettingsMsg('error', 'Organization name is required!'); return; }
 
-    fetch('http://localhost:3000/api/organizations/mine', {
+    fetch('/api/organizations/mine', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -2419,7 +2419,7 @@
       showPasswordMsg('error', 'New passwords do not match!'); return;
     }
 
-    fetch('http://localhost:3000/api/auth/change-password', {
+    fetch('/api/auth/change-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -2460,7 +2460,7 @@
   }
   // ── LOGOUT ──
   function doLogout() {
-    fetch('http://localhost:3000/api/auth/logout', {
+    fetch('/api/auth/logout', {
       method: 'POST',
       credentials: 'include'
     })

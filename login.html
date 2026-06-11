@@ -300,7 +300,7 @@
     }
 
     // Send login request to backend
-    fetch('http://localhost:3000/api/auth/login', {
+    fetch('/api/auth/login', {
       method:      'POST',
       headers:     { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -312,7 +312,7 @@
         showSuccess('Login successful! Redirecting...');
         // Redirect to backend-served dashboard
         setTimeout(() => {
-          window.location.href = `http://localhost:3000${data.redirect}`;
+          window.location.href = `${data.redirect}`;
         }, 1000);
       } else {
         showError(data.message);

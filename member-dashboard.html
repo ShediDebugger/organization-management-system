@@ -1260,7 +1260,7 @@
     });
 
     function checkAuth() {
-      fetch('http://localhost:3000/api/auth/me', { credentials: 'include' })
+      fetch('/api/auth/me', { credentials: 'include' })
         .then(res => {
           if (res.status === 401) {
             window.location.href = 'login.html';
@@ -1286,7 +1286,7 @@
     }
 
     function loadProfile() {
-      fetch('http://localhost:3000/api/members/profile', { credentials: 'include' })
+      fetch('/api/members/profile', { credentials: 'include' })
         .then(res => res.json())
         .then(data => {
           if (data.success) {
@@ -1356,7 +1356,7 @@
       }
       
       // Load upcoming events for Overview and count
-      fetch(`http://localhost:3000/api/events?org_id=${currentMemberProfile.org_id}`, { credentials: 'include' })
+      fetch(`/api/events?org_id=${currentMemberProfile.org_id}`, { credentials: 'include' })
         .then(res => res.json())
         .then(data => {
           if (data.success) {
@@ -1395,7 +1395,7 @@
         });
 
       // Load my payments
-      fetch(`http://localhost:3000/api/payments/my`, { credentials: 'include' })
+      fetch(`/api/payments/my`, { credentials: 'include' })
         .then(res => res.json())
         .then(data => {
           if (data.success) {
@@ -1466,7 +1466,7 @@
         listContainer.innerHTML = '<p class="text-center text-muted">No organization assigned. Join your organization to view events.</p>';
         return;
       }
-      fetch(`http://localhost:3000/api/events?org_id=${currentMemberProfile.org_id}`, { credentials: 'include' })
+      fetch(`/api/events?org_id=${currentMemberProfile.org_id}`, { credentials: 'include' })
         .then(res => res.json())
         .then(data => {
           if (data.success) {
@@ -1597,7 +1597,7 @@
     }
 
     function submitRSVP(eventId, status, btn) {
-      fetch(`http://localhost:3000/api/events/${eventId}/rsvp`, {
+      fetch(`/api/events/${eventId}/rsvp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -1628,7 +1628,7 @@
     }
 
     function loadPaymentsList() {
-      fetch(`http://localhost:3000/api/payments/my`, { credentials: 'include' })
+      fetch(`/api/payments/my`, { credentials: 'include' })
         .then(res => res.json())
         .then(data => {
           if (data.success) {
@@ -1658,7 +1658,7 @@
 
     function loadAnnouncements() {
       if (!currentMemberProfile || !currentMemberProfile.org_id) return;
-      fetch(`http://localhost:3000/api/blog?org_id=${currentMemberProfile.org_id}&status=published`, { credentials: 'include' })
+      fetch(`/api/blog?org_id=${currentMemberProfile.org_id}&status=published`, { credentials: 'include' })
         .then(res => res.json())
         .then(data => {
           if (data.success) {
@@ -1703,7 +1703,7 @@
       const emergency_name = document.getElementById('profile-emergency-name').value.trim();
       const emergency_phone = document.getElementById('profile-emergency-phone').value.trim();
 
-      fetch('http://localhost:3000/api/members/profile', {
+      fetch('/api/members/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -1743,7 +1743,7 @@
     });
 
     function handleLogout() {
-      fetch('http://localhost:3000/api/auth/logout', { method: 'POST', credentials: 'include' })
+      fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
         .then(() => {
           window.location.href = 'login.html';
         })
