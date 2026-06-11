@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: orgmember-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true
+      # Railway MySQL — add MYSQL_URL in Render dashboard under Environment
+      # Key: MYSQL_URL  Value: (paste from Railway)
