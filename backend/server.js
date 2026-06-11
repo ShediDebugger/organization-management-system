@@ -40,6 +40,7 @@ app.use(cors({
 }));
 
 // Session Setup (stores login state)
+app.set('trust proxy', 1); // Trust Render's proxy to allow secure cookies
 app.use(session({
   secret:            process.env.SESSION_SECRET || 'dev_secret_key',
   resave:            false,
