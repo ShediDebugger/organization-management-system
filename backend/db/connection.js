@@ -58,10 +58,24 @@ async function initSchema() {
         role         ENUM('superadmin', 'orgadmin', 'member') NOT NULL DEFAULT 'member',
         status       ENUM('active', 'inactive', 'suspended') NOT NULL DEFAULT 'active',
         avatar       VARCHAR(255),
+        reset_token  VARCHAR(255) DEFAULT NULL,
+        reset_token_expiry BIGINT DEFAULT NULL,
         created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       )
     `);
+
+    // Safely add reset_token and reset_token_expiry if they don't exist
+    try {
+      await conn.query(`ALTER TABLE users ADD COLUMN reset_token VARCHAR(255) DEFAULT NULL`);
+    } catch (e) {
+      if (e.code !== 'ER_DUP_FIELDNAME') console.log('Notice: reset_token column already exists or error:', e.message);
+    }
+    try {
+      await conn.query(`ALTER TABLE users ADD COLUMN reset_token_expiry BIGINT DEFAULT NULL`);
+    } catch (e) {
+      if (e.code !== 'ER_DUP_FIELDNAME') console.log('Notice: reset_token_expiry column already exists or error:', e.message);
+    }
 
     await conn.query(`
       CREATE TABLE IF NOT EXISTS organizations (

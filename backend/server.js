@@ -63,6 +63,9 @@ app.use('/api/payments',      require('./routes/payments'));
 app.use('/api/blog',          require('./routes/blog'));
 app.use('/api/superadmin',    require('./routes/superadmin'));
 app.use('/api/organizations', require('./routes/organizations'));
+app.use('/api/services',      require('./routes/services'));
+app.use('/api/tickets',       require('./routes/tickets'));
+app.use('/api/idcard',        require('./routes/idcard'));
 
 // ── Health Check ──
 app.get('/api/health', (req, res) => {

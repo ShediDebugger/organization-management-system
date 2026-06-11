@@ -949,6 +949,12 @@
           </div>
         </li>
         <li class="menu-item">
+          <div class="menu-link" onclick="switchTab('services')">
+            <i class="bi bi-box-seam menu-icon"></i>
+            <span>Services</span>
+          </div>
+        </li>
+        <li class="menu-item">
           <div class="menu-link" onclick="switchTab('blog')">
             <i class="bi bi-newspaper menu-icon"></i>
             <span>Blog</span>
@@ -958,6 +964,18 @@
           <div class="menu-link" onclick="switchTab('payments')">
             <i class="bi bi-credit-card menu-icon"></i>
             <span>Payments</span>
+          </div>
+        </li>
+        <li class="menu-item">
+          <div class="menu-link" onclick="switchTab('helpdesk')">
+            <i class="bi bi-life-preserver menu-icon"></i>
+            <span>Helpdesk</span>
+          </div>
+        </li>
+        <li class="menu-item">
+          <div class="menu-link" onclick="switchTab('idcard')">
+            <i class="bi bi-person-badge menu-icon"></i>
+            <span>My ID Card</span>
           </div>
         </li>
       </ul>
@@ -1210,6 +1228,52 @@
 
       </div>
 
+      <!-- ═══════════════════════════ SERVICES TAB ═══════════════════════════ -->
+      <div id="services-tab" class="tab-content">
+        <div class="section-box">
+          <div class="section-header">
+            <div>
+              <h3 class="section-title">Available Services</h3>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Request subscriptions, consulting, or access</p>
+            </div>
+          </div>
+          
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Service</th>
+                  <th>Description</th>
+                  <th>Fee</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="memberServicesTableBody">
+                <!-- Dynamic -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="section-box">
+          <h3 class="section-title">My Requests</h3>
+          <div class="table-wrapper" style="margin-top: 16px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Service</th>
+                  <th>Date Requested</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="myRequestsTableBody">
+                <!-- Dynamic -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       <!-- ═══════════════════════════ OTHER TABS (PLACEHOLDER) ═══════════════════════════ -->
       <div id="blog-tab" class="tab-content">
         <div class="section-box">
@@ -1243,11 +1307,185 @@
         </div>
       </div>
 
+      <!-- ═══════════════════════════ HELPDESK TAB ═══════════════════════════ -->
+      <div id="helpdesk-tab" class="tab-content">
+        <div class="section-box">
+          <div class="section-header">
+            <div>
+              <h3 class="section-title">Helpdesk Support</h3>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Submit and track your support tickets</p>
+            </div>
+            <button class="btn-primary" onclick="openModal('createTicketModal')">
+              <i class="bi bi-plus me-2"></i>New Ticket
+            </button>
+          </div>
+          
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Subject</th>
+                  <th>Status</th>
+                  <th>Priority</th>
+                  <th>Last Updated</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="memberTicketsTableBody">
+                <!-- Dynamic -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      <!-- ═══════════════════════════ ID CARD TAB ═══════════════════════════ -->
+      <div id="idcard-tab" class="tab-content">
+
+        <div class="section-box" style="text-align:center;">
+          <div>
+            <h3 class="section-title">Your Digital ID Card</h3>
+            <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:32px;">Your official organization membership card — ready to share or download.</p>
+          </div>
+
+          <!-- THE ID CARD -->
+          <div style="display:flex;justify-content:center;margin-bottom:32px;">
+            <div id="digitalIdCard" style="
+              width: 380px;
+              height: 240px;
+              background: linear-gradient(135deg, #0b1628 0%, #11213a 60%, #1a3050 100%);
+              border-radius: 18px;
+              border: 1px solid rgba(245,166,35,0.3);
+              box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04), inset 0 1px 0 rgba(255,255,255,0.08);
+              position: relative;
+              overflow: hidden;
+              font-family: 'Inter', sans-serif;
+              color: #ffffff;
+              padding: 24px;
+              display: flex;
+              flex-direction: column;
+              justify-content: space-between;
+            ">
+              <!-- Background Decorations -->
+              <div style="position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(245,166,35,0.07);pointer-events:none;"></div>
+              <div style="position:absolute;bottom:-50px;left:-30px;width:200px;height:200px;border-radius:50%;background:rgba(245,166,35,0.04);pointer-events:none;"></div>
+              <div style="position:absolute;top:0;right:0;width:4px;height:100%;background:linear-gradient(180deg,#f5a623,transparent);opacity:0.6;pointer-events:none;"></div>
+
+              <!-- Top Row: Logo + Card Type -->
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:1;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div style="width:28px;height:28px;background:#f5a623;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;">
+                    <i class="bi bi-diagram-3-fill" style="color:#0b1628;"></i>
+                  </div>
+                  <span style="font-family:'Playfair Display',serif;font-weight:800;font-size:1rem;letter-spacing:-0.02em;">OrgMember</span>
+                </div>
+                <span style="font-size:0.65rem;font-weight:600;letter-spacing:0.1em;color:#f5a623;text-transform:uppercase;background:rgba(245,166,35,0.12);padding:3px 8px;border-radius:20px;border:1px solid rgba(245,166,35,0.25);" id="cardTypeLabel">MEMBER</span>
+              </div>
+
+              <!-- Middle: Avatar + Name + Role -->
+              <div style="display:flex;align-items:center;gap:16px;position:relative;z-index:1;">
+                <div id="cardAvatar" style="width:54px;height:54px;background:linear-gradient(135deg,#f5a623,#e09520);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:700;color:#0b1628;flex-shrink:0;box-shadow:0 4px 15px rgba(245,166,35,0.4);">
+                  --
+                </div>
+                <div>
+                  <div id="cardName" style="font-size:1.1rem;font-weight:700;letter-spacing:-0.01em;margin-bottom:2px;">Loading...</div>
+                  <div id="cardRoleInOrg" style="font-size:0.72rem;color:#8fa8c8;text-transform:uppercase;letter-spacing:0.07em;">Member</div>
+                  <div id="cardOrgName" style="font-size:0.78rem;color:#f5a623;margin-top:2px;font-weight:500;">Organization</div>
+                </div>
+              </div>
+
+              <!-- Bottom Row: Member Code + Join Date -->
+              <div style="display:flex;justify-content:space-between;align-items:flex-end;position:relative;z-index:1;">
+                <div>
+                  <div style="font-size:0.6rem;color:#5a7a9a;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:2px;">Member ID</div>
+                  <div id="cardMemberId" style="font-size:0.85rem;font-weight:700;letter-spacing:0.05em;color:#f5a623;font-family:'Courier New',monospace;">OM-000-00000</div>
+                </div>
+                <div style="text-align:right;">
+                  <div style="font-size:0.6rem;color:#5a7a9a;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:2px;">Member Since</div>
+                  <div id="cardJoinDate" style="font-size:0.78rem;font-weight:600;color:#8fa8c8;">—</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+            <button onclick="downloadIdCard()" class="btn-primary" style="padding:12px 28px;">
+              <i class="bi bi-download me-2"></i>Download Card
+            </button>
+            <button onclick="printIdCard()" style="background:transparent;border:1px solid var(--border);color:var(--text-white);padding:12px 28px;border-radius:var(--radius);cursor:pointer;font-family:Inter,sans-serif;font-weight:500;display:flex;align-items:center;gap:8px;transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+              <i class="bi bi-printer me-2"></i>Print
+            </button>
+          </div>
+
+          <!-- Info note -->
+          <p style="color:var(--text-dim);font-size:0.78rem;margin-top:20px;">
+            <i class="bi bi-shield-check me-1" style="color:var(--accent);"></i>
+            This is your official digital membership card. Keep it secure.
+          </p>
+        </div>
+      </div>
+
     </main>
+
+    <!-- ═══ MODALS ═══ -->
+    <div class="modal-overlay" id="createTicketModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;align-items:center;justify-content:center;">
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;width:100%;max-width:500px;">
+        <h3 style="margin-top:0;font-family:'Playfair Display',serif;font-size:1.5rem;">Create Support Ticket</h3>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:24px;">Please describe the issue you're facing.</p>
+        
+        <form id="createTicketForm" onsubmit="handleCreateTicket(event)">
+          <div style="margin-bottom:16px;">
+            <label style="display:block;font-size:0.85rem;font-weight:600;margin-bottom:6px;">Subject</label>
+            <input type="text" id="ticketSubject" required style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px 12px;border-radius:var(--radius);font-family:Inter,sans-serif;" placeholder="Brief summary of the issue" />
+          </div>
+          <div style="margin-bottom:16px;">
+            <label style="display:block;font-size:0.85rem;font-weight:600;margin-bottom:6px;">Priority</label>
+            <select id="ticketPriority" style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px 12px;border-radius:var(--radius);font-family:Inter,sans-serif;">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+              <option value="urgent">Urgent</option>
+            </select>
+          </div>
+          <div style="margin-bottom:24px;">
+            <label style="display:block;font-size:0.85rem;font-weight:600;margin-bottom:6px;">Message</label>
+            <textarea id="ticketMessage" required rows="4" style="width:100%;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px 12px;border-radius:var(--radius);font-family:Inter,sans-serif;resize:vertical;" placeholder="Describe your issue in detail..."></textarea>
+          </div>
+          
+          <div style="display:flex;justify-content:flex-end;gap:12px;">
+            <button type="button" onclick="closeModal('createTicketModal')" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:10px 16px;border-radius:var(--radius);cursor:pointer;font-family:Inter,sans-serif;">Cancel</button>
+            <button type="submit" style="background:var(--accent);border:none;color:var(--bg-dark);padding:10px 16px;border-radius:var(--radius);font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">Submit Ticket</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="viewTicketModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;align-items:center;justify-content:center;">
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;width:100%;max-width:600px;display:flex;flex-direction:column;max-height:90vh;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <h3 id="viewTicketSubject" style="margin:0;font-family:'Playfair Display',serif;font-size:1.3rem;">Ticket Subject</h3>
+          <span id="viewTicketStatus" class="badge"></span>
+        </div>
+        
+        <div id="ticketMessagesContainer" style="flex:1;overflow-y:auto;background:var(--bg-dark);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:20px;display:flex;flex-direction:column;gap:12px;">
+          <!-- Dynamic Messages -->
+        </div>
+
+        <form id="replyTicketForm" onsubmit="handleTicketReply(event)" style="display:flex;gap:12px;">
+          <input type="hidden" id="replyTicketId" />
+          <input type="text" id="replyMessage" required style="flex:1;background:var(--bg-dark);border:1px solid var(--border);color:var(--text-white);padding:10px 12px;border-radius:var(--radius);font-family:Inter,sans-serif;" placeholder="Type your reply..." />
+          <button type="submit" class="btn-primary" style="padding:10px 20px;">Send</button>
+        </form>
+        
+        <div style="margin-top:16px;text-align:right;">
+          <button type="button" onclick="closeModal('viewTicketModal')" style="background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-family:Inter,sans-serif;">Close</button>
+        </div>
+      </div>
+    </div>
 
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="theme-toggle.js"></script>
 
   <script>
@@ -1751,6 +1989,342 @@
           window.location.href = 'login.html';
         });
     }
+  // ══════════════════════════════════════════
+  // SERVICES LOGIC
+  // ══════════════════════════════════════════
+  async function fetchMemberServices() {
+    try {
+      const res = await fetch('/api/services');
+      const data = await res.json();
+      const tbody = document.getElementById('memberServicesTableBody');
+      if (data.success && data.services.length > 0) {
+        tbody.innerHTML = data.services.filter(s => s.status === 'active').map(s => `
+          <tr>
+            <td style="font-weight:600;color:var(--text-white);">
+              ${s.title} <br>
+              <span class="badge badge-general" style="margin-top:4px;">${s.service_type}</span>
+            </td>
+            <td style="color:var(--text-dim);font-size:0.85rem;">${s.description || 'No description'}</td>
+            <td style="color:var(--success);font-weight:600;">$${parseFloat(s.fee).toFixed(2)}</td>
+            <td>
+              <button class="btn-primary" style="padding:6px 12px;font-size:0.8rem;" onclick="requestService(${s.id}, '${s.title.replace(/'/g, "\\'")}')">Request</button>
+            </td>
+          </tr>
+        `).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-dim);">No active services available.</td></tr>';
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async function fetchMyServiceRequests() {
+    try {
+      const res = await fetch('/api/services/requests/all');
+      const data = await res.json();
+      const tbody = document.getElementById('myRequestsTableBody');
+      if (data.success && data.requests.length > 0) {
+        tbody.innerHTML = data.requests.map(r => `
+          <tr>
+            <td style="font-weight:500;color:var(--text-white);">${r.service_title}</td>
+            <td>${new Date(r.created_at).toLocaleDateString()}</td>
+            <td><span class="badge ${r.status === 'pending' ? 'badge-pending' : (r.status === 'approved' ? 'badge-active' : 'badge-inactive')}">${r.status}</span></td>
+          </tr>
+        `).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--text-dim);">You have not requested any services.</td></tr>';
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async function requestService(id, title) {
+    if (!confirm(`Are you sure you want to request: ${title}?`)) return;
+    try {
+      const res = await fetch(`/api/services/request/${id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notes: 'Requested via dashboard' })
+      });
+      const data = await res.json();
+      alert(data.message);
+      if (data.success) fetchMyServiceRequests();
+    } catch (e) {
+      alert('Error requesting service');
+    }
+  }
+
+  // Hook into tab switching
+  const originalSwitchTabMember = window.switchTab;
+  window.switchTab = function(tabId) {
+    if (originalSwitchTabMember) originalSwitchTabMember(tabId);
+    if (tabId === 'services') {
+      fetchMemberServices();
+      fetchMyServiceRequests();
+    }
+  };
+
+  // ══════════════════════════════════════════
+  // HELPDESK LOGIC
+  // ══════════════════════════════════════════
+  function openModal(id) {
+    document.getElementById(id).style.display = 'flex';
+  }
+  function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+  }
+  document.querySelectorAll('.modal-overlay').forEach(modal => {
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) modal.style.display = 'none';
+    });
+  });
+
+  async function fetchTickets() {
+    try {
+      const res = await fetch('/api/tickets');
+      const data = await res.json();
+      const tbody = document.getElementById('memberTicketsTableBody');
+      if (data.success && data.tickets.length > 0) {
+        tbody.innerHTML = data.tickets.map(t => `
+          <tr>
+            <td style="font-weight:600;color:var(--text-white);">${t.subject}</td>
+            <td><span class="badge ${t.status === 'open' ? 'badge-pending' : (t.status === 'resolved' || t.status === 'closed' ? 'badge-inactive' : 'badge-active')}">${t.status.replace('_', ' ')}</span></td>
+            <td><span class="badge badge-general">${t.priority}</span></td>
+            <td>${new Date(t.updated_at).toLocaleDateString()}</td>
+            <td>
+              <button class="btn-primary" style="padding:6px 12px;font-size:0.8rem;" onclick="viewTicket(${t.id})">View</button>
+            </td>
+          </tr>
+        `).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);">No tickets found.</td></tr>';
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async function handleCreateTicket(e) {
+    e.preventDefault();
+    const subject = document.getElementById('ticketSubject').value;
+    const priority = document.getElementById('ticketPriority').value;
+    const initial_message = document.getElementById('ticketMessage').value;
+
+    try {
+      const res = await fetch('/api/tickets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject, priority, initial_message })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('Ticket created successfully!');
+        closeModal('createTicketModal');
+        document.getElementById('createTicketForm').reset();
+        fetchTickets();
+      } else {
+        alert(data.message);
+      }
+    } catch (err) {
+      alert('Error creating ticket');
+    }
+  }
+
+  async function viewTicket(id) {
+    try {
+      const res = await fetch(`/api/tickets/${id}`);
+      const data = await res.json();
+      if (data.success) {
+        const ticket = data.ticket;
+        document.getElementById('viewTicketSubject').textContent = ticket.subject;
+        
+        let statusBadge = '';
+        if (ticket.status === 'open') statusBadge = 'badge-pending';
+        else if (ticket.status === 'resolved' || ticket.status === 'closed') statusBadge = 'badge-inactive';
+        else statusBadge = 'badge-active';
+        
+        const statusSpan = document.getElementById('viewTicketStatus');
+        statusSpan.className = 'badge ' + statusBadge;
+        statusSpan.textContent = ticket.status.replace('_', ' ');
+
+        const container = document.getElementById('ticketMessagesContainer');
+        container.innerHTML = data.messages.map(m => {
+          const isMe = m.sender_id === currentMemberProfile.id; // currentMemberProfile is loaded in loadProfile
+          return `
+            <div style="display:flex;flex-direction:column;align-items:${isMe ? 'flex-end' : 'flex-start'};">
+              <span style="font-size:0.75rem;color:var(--text-dim);margin-bottom:4px;">${m.sender_name} (${m.sender_role}) - ${new Date(m.created_at).toLocaleString()}</span>
+              <div style="background:${isMe ? 'var(--accent-light)' : 'var(--bg-card)'};color:var(--text-white);padding:10px 14px;border-radius:var(--radius);max-width:85%;border:1px solid ${isMe ? 'rgba(245,166,35,0.3)' : 'var(--border)'};">
+                ${m.message.replace(/\n/g, '<br>')}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        document.getElementById('replyTicketId').value = id;
+        openModal('viewTicketModal');
+
+        // Scroll to bottom
+        setTimeout(() => {
+          container.scrollTop = container.scrollHeight;
+        }, 100);
+      } else {
+        alert(data.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error fetching ticket details');
+    }
+  }
+
+  async function handleTicketReply(e) {
+    e.preventDefault();
+    const id = document.getElementById('replyTicketId').value;
+    const message = document.getElementById('replyMessage').value;
+    
+    try {
+      const res = await fetch(`/api/tickets/${id}/message`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message })
+      });
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById('replyMessage').value = '';
+        viewTicket(id); // reload ticket
+        fetchTickets(); // refresh list to update timestamp/status
+      } else {
+        alert(data.message);
+      }
+    } catch (err) {
+      alert('Error sending reply');
+    }
+  }
+
+  // Hook into tab switching
+  const originalSwitchTabMember2 = window.switchTab;
+  window.switchTab = function(tabId) {
+    if (originalSwitchTabMember2) originalSwitchTabMember2(tabId);
+    if (tabId === 'helpdesk') {
+      fetchTickets();
+    }
+    if (tabId === 'idcard') {
+      loadIdCard();
+    }
+  };
+
+  // ══════════════════════════════════════════
+  // DIGITAL ID CARD LOGIC
+  // ══════════════════════════════════════════
+  let idCardData = null;
+
+  async function loadIdCard() {
+    // Only load if not already loaded
+    if (idCardData) return;
+    try {
+      const res = await fetch('/api/idcard');
+      const data = await res.json();
+      if (data.success) {
+        idCardData = data.idCard;
+        populateIdCard(idCardData);
+      }
+    } catch (e) {
+      console.error('ID Card load error:', e);
+    }
+  }
+
+  function populateIdCard(card) {
+    const { user, membership, organization, memberCode } = card;
+
+    // Avatar initials
+    const initials = user.full_name
+      ? user.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+      : '--';
+    document.getElementById('cardAvatar').textContent = initials;
+
+    // Name
+    document.getElementById('cardName').textContent = user.full_name || 'Member';
+
+    // Role in org
+    const roleLabel = membership?.role_in_org
+      ? membership.role_in_org.charAt(0).toUpperCase() + membership.role_in_org.slice(1).replace('_', ' ')
+      : 'Member';
+    document.getElementById('cardRoleInOrg').textContent = roleLabel;
+
+    // Card type label
+    document.getElementById('cardTypeLabel').textContent = user.role.toUpperCase();
+
+    // Org name
+    document.getElementById('cardOrgName').textContent = organization?.name || 'OrgMember';
+
+    // Member ID code
+    document.getElementById('cardMemberId').textContent = memberCode;
+
+    // Join date
+    const joinDate = membership?.join_date
+      ? new Date(membership.join_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+      : '—';
+    document.getElementById('cardJoinDate').textContent = joinDate;
+  }
+
+  async function downloadIdCard() {
+    const card = document.getElementById('digitalIdCard');
+    if (!card) return;
+
+    // Show loading state on button
+    const btn = event.currentTarget;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Generating...';
+    btn.disabled = true;
+
+    try {
+      const canvas = await html2canvas(card, {
+        scale: 3,            // High resolution
+        useCORS: true,
+        backgroundColor: null,
+        logging: false
+      });
+
+      const link = document.createElement('a');
+      const fileName = idCardData
+        ? `OrgMember_ID_${idCardData.memberCode}.png`
+        : 'OrgMember_ID_Card.png';
+      link.download = fileName;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch (e) {
+      console.error('Download error:', e);
+      alert('Could not download the card. Please try printing instead.');
+    } finally {
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }
+  }
+
+  function printIdCard() {
+    const cardEl = document.getElementById('digitalIdCard');
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+      <!DOCTYPE html><html><head>
+        <title>My ID Card - OrgMember</title>
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+        <style>
+          body { margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #0b1628; }
+          @media print { @page { size: landscape; margin: 10mm; } body { background: white; } }
+        </style>
+      </head><body>
+        ${cardEl.outerHTML}
+      </body></html>
+    `);
+    printWindow.document.close();
+    setTimeout(() => {
+      printWindow.focus();
+      printWindow.print();
+    }, 500);
+  }
+
   </script>
 
 </body>

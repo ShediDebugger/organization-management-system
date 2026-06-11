@@ -176,4 +176,85 @@ router.post('/change-password', async (req, res) => {
   }
 });
 
+// ══════════════════════════════════════════
+// POST /api/auth/forgot-password
+// Initiate password recovery
+// ══════════════════════════════════════════
+const crypto = require('crypto');
+
+router.post('/forgot-password', async (req, res) => {
+  const { email } = req.body;
+  
+  if (!email) {
+    return res.status(400).json({ success: false, message: 'Email is required' });
+  }
+
+  try {
+    const [users] = await db.query('SELECT id, full_name FROM users WHERE email = ?', [email]);
+    if (users.length === 0) {
+      // Don't leak whether the email exists or not for security reasons
+      return res.json({ success: true, message: 'If the email exists, a password reset link has been sent.' });
+    }
+
+    const user = users[0];
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenExpiry = Date.now() + 3600000; // 1 hour from now
+
+    await db.query(
+      'UPDATE users SET reset_token = ?, reset_token_expiry = ? WHERE id = ?',
+      [resetToken, resetTokenExpiry, user.id]
+    );
+
+    // In a real application, you would send an email here with a link like:
+    // http://localhost:3000/reset-password.html?token=${resetToken}
+    console.log(`\n📧 MOCK EMAIL TO: ${email}`);
+    console.log(`Subject: Reset your OrgMember password`);
+    console.log(`Link: http://localhost:${process.env.PORT || 3000}/reset-password.html?token=${resetToken}\n`);
+
+    res.json({ success: true, message: 'If the email exists, a password reset link has been sent.' });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// ══════════════════════════════════════════
+// POST /api/auth/reset-password
+// Reset password using token
+// ══════════════════════════════════════════
+router.post('/reset-password', async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  if (!token || !newPassword) {
+    return res.status(400).json({ success: false, message: 'Token and new password are required' });
+  }
+  if (newPassword.length < 6) {
+    return res.status(400).json({ success: false, message: 'New password must be at least 6 characters' });
+  }
+
+  try {
+    const [users] = await db.query(
+      'SELECT id FROM users WHERE reset_token = ? AND reset_token_expiry > ?',
+      [token, Date.now()]
+    );
+
+    if (users.length === 0) {
+      return res.status(400).json({ success: false, message: 'Invalid or expired token' });
+    }
+
+    const userId = users[0].id;
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await db.query(
+      'UPDATE users SET password = ?, reset_token = NULL, reset_token_expiry = NULL WHERE id = ?',
+      [hashed, userId]
+    );
+
+    res.json({ success: true, message: 'Password has been reset successfully. You can now log in.' });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
 module.exports = router;
